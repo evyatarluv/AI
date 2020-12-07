@@ -8,7 +8,7 @@ def is_node_exist(table, existed_list):
     """
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
-    :param existed_list: list with nodes
+    :param existed_list: list with the existed nodes
     :return:
     """
 
@@ -75,16 +75,16 @@ class EightPuzzle:
 
         while len(open_list) > 0:
 
-            # Iteration status
-            iterations += 1
-            if iterations % 100 == 0:
-                print('Status: Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
-
             # Current node and current children of the node
             current_node = open_list.pop(0)
             current_children = []
 
-            # print(current_node.depth())
+            # Iteration status
+            iterations += 1
+            if iterations % 100 == 0:
+                print('-- Status --')
+                print('Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
+                print('Depth: {}, UB: {}'.format(current_node.depth(), ub))
 
             # For each available children
             for n in current_node.expand():
@@ -97,9 +97,6 @@ class EightPuzzle:
                         ub = current_node.g_value + 1
                         solution = Node(n, ub, ub, current_node)
 
-                        # Debug
-                        print('UB = {}'.format(ub))
-
                 # This children is not the goal state
                 else:
 
@@ -109,9 +106,9 @@ class EightPuzzle:
                         if lb < ub:
                             current_children.append(Node(n, current_node.g_value + 1, lb, current_node))
 
-            # current_children.sort(key=lambda x: x.lb)
+            current_children.sort(key=lambda x: x.lb)
             open_list = current_children + open_list
-            open_list.sort(key=lambda x: x.lb)
+            # open_list.sort(key=lambda x: x.lb)
             close_list.append(current_node)
 
         self.solution = solution
