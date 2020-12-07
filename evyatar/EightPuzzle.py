@@ -93,7 +93,9 @@ class EightPuzzle:
 
                 # If this children is the goal state
                 if (n == self.goal_state).all():
+
                     print('Got one')
+
                     # If this solution is better then the current solution
                     if current_node.g_value + 1 < ub:
                         ub = current_node.g_value + 1
@@ -110,6 +112,7 @@ class EightPuzzle:
 
             current_children.sort(key=lambda x: x.lb)
             open_list = current_children + open_list
+            # open_list.sort(key=lambda x: x.lb)
             close_list.append(current_node)
 
         self.solution = solution

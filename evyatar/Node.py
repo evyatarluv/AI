@@ -12,10 +12,7 @@ class Node:
 
         self.lb = lb
 
-        if parent is None:
-            self.parent = None
-        else:
-            self.parent = copy.deepcopy(parent)
+        self.parent = copy.copy(parent)
 
     def expand(self):
 
