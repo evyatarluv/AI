@@ -109,9 +109,9 @@ class EightPuzzle:
                         if lb < ub:
                             current_children.append(Node(n, current_node.g_value + 1, lb, current_node))
 
-            current_children.sort(key=lambda x: x.lb)
+            # current_children.sort(key=lambda x: x.lb)
             open_list = current_children + open_list
-            # open_list.sort(key=lambda x: x.lb)
+            open_list.sort(key=lambda x: x.lb)
             close_list.append(current_node)
 
         self.solution = solution
