@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 from .Node import Node
 
