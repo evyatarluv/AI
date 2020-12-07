@@ -57,8 +57,6 @@ class EightPuzzle:
         :return: solution as Node object
         """
 
-        # todo: add return to solution
-
         if method == 'BnB':
             self.bnb_solve(h_function)
 

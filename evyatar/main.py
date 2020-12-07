@@ -10,18 +10,22 @@ goal_state = np.array([[1, 2, 3],
 
 def init_table(seed=None):
 
+    """
+    This function create initial state of the 8-puzzle
+    :param seed: seed to the random function, optional
+    :return:
+    """
+
     if seed is not None:
         rnd.seed(seed)
 
-    # todo: make it more clear!!!!!!
-    numbers = range(9)
-    rnd.shuffle(numbers)
-    table = np.array(numbers).reshape((3, 3))
-
-    return table
+    return np.array(rnd.sample(range(9), 9)).reshape((3, 3))
 
 
-# todo: build h function with Manhattan distance
+def h_manhattan(table, goal_table):
+    # todo: build h function with Manhattan distance
+    pass
+
 
 # Debug
 a = np.array([[1, 2, 3],
