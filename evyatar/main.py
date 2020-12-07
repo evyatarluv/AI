@@ -1,6 +1,6 @@
 import numpy as np
 from evyatar.Node import Node
-from evyatar.EightPuzzle import reconstruct_solution
+from evyatar.EightPuzzle import EightPuzzle
 import random as rnd
 
 goal_state = np.array([[1, 2, 3],
@@ -49,6 +49,17 @@ def h_manhattan(table, goal_table):
     return manhattan_sum
 
 
+def main():
+
+    init_state = init_table()
+
+    p = EightPuzzle(init_state, goal_state)
+
+    p.solve('BnB', h_manhattan)
+
+
+if __name__ == '__main__':
+    main()
 # Debug
 a = np.array([[1, 2, 3],
               [0, 4, 6],

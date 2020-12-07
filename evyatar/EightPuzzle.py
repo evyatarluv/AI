@@ -39,9 +39,9 @@ def reconstruct_solution(solution):
 
 class EightPuzzle:
 
-    def __init__(self, init_table, goal_state):
+    def __init__(self, init_state, goal_state):
 
-        self.init_table = Node(init_table, 0, None)
+        self.init_state = Node(init_state, 0, None)
 
         self.goal_state = goal_state
 
@@ -64,7 +64,7 @@ class EightPuzzle:
             self.a_star_solve(h_function)
 
         else:
-            raise NameError('Unused method')
+            raise NameError('Unused method, please choose `BnB` or `A*`.')
 
         return reconstruct_solution(self.solution)
 
@@ -72,7 +72,7 @@ class EightPuzzle:
 
         # Init params
         solution = None
-        open_list = [self.init_table]
+        open_list = [self.init_state]
         close_list = []
         ub = np.inf
 
@@ -86,7 +86,7 @@ class EightPuzzle:
             for n in current_node.expand():
 
                 # If this children is the goal state
-                if n == self.goal_state:
+                if (n == self.goal_state).all():
 
                     # If this solution is better then the current solution
                     if current_node.g_value + 1 < ub:

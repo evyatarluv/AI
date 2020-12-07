@@ -19,7 +19,7 @@ class Node:
 
         children = []
         empty_cell = np.where(self.table == 0)
-        col, row = empty_cell[0][0], empty_cell[1][0]
+        row, col = empty_cell[0][0], empty_cell[1][0]
 
         # Up
         try:
@@ -50,15 +50,23 @@ class Node:
 
 def swap(table, pos_1, pos_2):
             """
-
+            This function swap between two elements in ndarray
             :param table:
-            :param pos_1: position to move into the emtpy cell
-            :param pos_2: position of the empty cell (0)
+            :param pos_1: position of the 1st element
+            :param pos_2: position of the 2nd element
             :return:
             """
+            # Dont use minus index (python can use it)
+            if -1 in (pos_1 + pos_2):
+                raise IndexError
 
-            table = table.copy()
-            table[pos_2[0]][pos_2[1]] = table[pos_1[0]][pos_1[1]]
-            table[pos_1[0]][pos_1[1]] = 0
+            # Copy the table
+            table = copy.deepcopy(table)
+
+            # Swap
+            temp = table[pos_1[0]][pos_1[1]]
+            table[pos_1[0]][pos_1[1]] = table[pos_2[0]][pos_2[1]]
+            table[pos_2[0]][pos_2[1]] = temp
+
             return table
 
