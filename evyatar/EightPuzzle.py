@@ -81,8 +81,10 @@ class EightPuzzle:
             #     print('Status: Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
 
             # Current node and current children of the node
-            current_node = open_list.pop()
+            current_node = open_list.pop(0)
             current_children = []
+
+            # print(current_node.depth())
 
             # For each available children
             for n in current_node.expand():
