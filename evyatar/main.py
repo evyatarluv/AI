@@ -4,8 +4,8 @@ from evyatar.EightPuzzle import reconstruct_solution
 import random as rnd
 
 goal_state = np.array([[1, 2, 3],
-                       [0, 4, 6],
-                       [7, 8, 5]])
+                       [4, 5, 6],
+                       [7, 8, 0]])
 
 
 def init_table(seed=None):
@@ -23,8 +23,30 @@ def init_table(seed=None):
 
 
 def h_manhattan(table, goal_table):
-    # todo: build h function with Manhattan distance
-    pass
+    """
+    This h function calculate the sum of manhattan distance between current table
+    to the goal table.
+    :param table: current table, ndarray with shape (3,3)
+    :param goal_table: gaol state table, ndarray with shape (3,3)
+    :return:
+    """
+
+    manhattan_sum = 0
+
+    for i in range(1, 9):
+
+        # Get position on current table
+        table_pos = np.where(table == i)
+
+        # Get position on goal table
+        goal_pos = np.where(goal_table == i)
+
+        # Compute manhattan distance and sum
+        x_distance = np.abs(table_pos[0][0] - goal_pos[0][0])
+        y_distance = np.abs(table_pos[1][0] - goal_pos[1][0])
+        manhattan_sum += x_distance + y_distance
+
+    return manhattan_sum
 
 
 # Debug
@@ -33,15 +55,11 @@ a = np.array([[1, 2, 3],
               [7, 8, 5]])
 
 b = np.array([[1, 2, 3],
-              [99, 4, 6],
-              [7, 8, 5]])
-
-c = np.array([[1, 2, 3],
-              [999, 4, 6],
+              [0, 4, 6],
               [7, 8, 5]])
 
 a_node = Node(a, 0, None)
 b_node = Node(b, 0, a_node)
-c_node = Node(c, 0, b_node)
-sol = (reconstruct_solution(c_node))
+
+h_manhattan(a, goal_state)
 
