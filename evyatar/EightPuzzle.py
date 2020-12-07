@@ -1,26 +1,20 @@
 import copy
-
 import numpy as np
 from .Node import Node
+import time
 
 
-def is_node_exist(table, open_list, close_list):
+def is_node_exist(table, existed_list):
     """
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
-    :param open_list: list with nodes
-    :param close_list: list with ndarray
+    :param existed_list: list with nodes
     :return:
     """
 
-    # Check in the open list
-    for t in open_list:
+    # Check if this table already exist
+    for t in existed_list:
         if (table == t.table).all():
-            return True
-
-    # Check in the close list
-    for t in close_list:
-        if (table == t).all():
             return True
 
     return False
@@ -106,7 +100,7 @@ class EightPuzzle:
                 # This children is not the goal state
                 else:
 
-                    if not is_node_exist(n, open_list, close_list):
+                    if not is_node_exist(n, open_list + close_list):
 
                         lb = current_node.g_value + 1 + h_function(n, self.goal_state)
                         if lb < ub:

@@ -46,6 +46,18 @@ class Node:
 
         return children
 
+    def depth(self):
+
+        depth = 1
+        p = self.parent
+
+        while p is not None:
+
+            depth += 1
+            p = p.parent
+
+        return depth
+
 
 def swap(table, pos_1, pos_2):
             """
