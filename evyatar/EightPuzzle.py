@@ -76,9 +76,9 @@ class EightPuzzle:
         while len(open_list) > 0:
 
             # Iteration status
-            # iterations += 1
-            # if iterations % 100 == 0:
-            #     print('Status: Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
+            iterations += 1
+            if iterations % 100 == 0:
+                print('Status: Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
 
             # Current node and current children of the node
             current_node = open_list.pop(0)
@@ -92,12 +92,13 @@ class EightPuzzle:
                 # If this children is the goal state
                 if (n == self.goal_state).all():
 
-                    print('Got one')
-
                     # If this solution is better then the current solution
                     if current_node.g_value + 1 < ub:
                         ub = current_node.g_value + 1
                         solution = Node(n, ub, ub, current_node)
+
+                        # Debug
+                        print('UB = {}'.format(ub))
 
                 # This children is not the goal state
                 else:
