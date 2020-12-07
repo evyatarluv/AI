@@ -4,11 +4,13 @@ import copy
 
 class Node:
 
-    def __init__(self, table, g_value, parent):
+    def __init__(self, table, g_value, lb, parent):
 
         self.table = table
 
         self.g_value = g_value
+
+        self.lb = lb
 
         if parent is None:
             self.parent = None

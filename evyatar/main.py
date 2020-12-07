@@ -69,8 +69,5 @@ b = np.array([[1, 2, 3],
               [0, 4, 6],
               [7, 8, 5]])
 
-a_node = Node(a, 0, None)
-b_node = Node(b, 0, a_node)
-
 h_manhattan(a, goal_state)
 
