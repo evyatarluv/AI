@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from zohar.Node import Node
+from .Node import Node
 import time
 
 
@@ -76,7 +76,7 @@ class EightPuzzle:
         while len(open_list) > 0:
 
             # Current node and current children of the node
-            current_node = open_list[0]
+            current_node = open_list.pop(0)
             current_children = []
 
             # Iteration status
@@ -107,9 +107,10 @@ class EightPuzzle:
 
                         if lb < ub:
                             current_children.append(child_node)
+                        else:  # todo: think if needed
+                            close_list.append(child_node)
 
             current_children.sort(key=lambda x: x.lb)
-            open_list.pop(0)
             open_list = current_children + open_list
             # open_list.sort(key=lambda x: x.lb)
             close_list.append(current_node)
