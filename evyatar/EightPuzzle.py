@@ -70,23 +70,21 @@ class EightPuzzle:
         solution = None
         open_list = [self.init_state]
         close_list = []
-        ub = np.inf
+        ub = 31
         iterations = 0
 
         while len(open_list) > 0:
-
-
 
             # Current node and current children of the node
             current_node = open_list.pop(0)
             current_children = []
 
             # Iteration status
-            # iterations += 1
-            # if iterations % 100 == 0:
-            #     print('-- Status --')
-            #     print('Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
-            #     print('Depth: {}, UB: {}'.format(current_node.depth(), ub))
+            iterations += 1
+            if iterations % 100 == 0:
+                print('-- Status --')
+                print('Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
+                print('Depth: {}, UB: {}'.format(current_node.depth(), ub))
 
             # For each available children
             for n in current_node.expand():
@@ -105,8 +103,12 @@ class EightPuzzle:
                     if not is_node_exist(n, open_list + close_list):
 
                         lb = current_node.g_value + 1 + h_function(n, self.goal_state)
+                        child_node = Node(n, current_node.g_value + 1, lb, current_node)
+
                         if lb < ub:
-                            current_children.append(Node(n, current_node.g_value + 1, lb, current_node))
+                            current_children.append(child_node)
+                        else:  # todo: think if needed
+                            close_list.append(child_node)
 
             current_children.sort(key=lambda x: x.lb)
             open_list = current_children + open_list
