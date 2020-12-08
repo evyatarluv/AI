@@ -55,11 +55,13 @@ def main():
 
     p = EightPuzzle(init_state, goal_state)
 
-    p.solve('BnB', h_manhattan)
+    sol = p.solve('BnB', h_manhattan)
+    print(len(sol))
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    pass
 # Debug
 a = np.array([[1, 2, 3],
               [0, 4, 6],
@@ -69,5 +71,6 @@ b = np.array([[1, 2, 3],
               [0, 4, 6],
               [7, 8, 5]])
 
+print(Node(a, 0, 0, None))
 h_manhattan(a, goal_state)
 

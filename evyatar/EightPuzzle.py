@@ -9,7 +9,7 @@ def is_node_exist(table, existed_list):
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
     :param existed_list: list with the existed nodes
-    :return:
+    :return: bool answer if the table appear in the existed list
     """
 
     # Check if this table already exist
@@ -75,16 +75,18 @@ class EightPuzzle:
 
         while len(open_list) > 0:
 
+
+
             # Current node and current children of the node
             current_node = open_list.pop(0)
             current_children = []
 
             # Iteration status
-            iterations += 1
-            if iterations % 100 == 0:
-                print('-- Status --')
-                print('Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
-                print('Depth: {}, UB: {}'.format(current_node.depth(), ub))
+            # iterations += 1
+            # if iterations % 100 == 0:
+            #     print('-- Status --')
+            #     print('Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
+            #     print('Depth: {}, UB: {}'.format(current_node.depth(), ub))
 
             # For each available children
             for n in current_node.expand():
