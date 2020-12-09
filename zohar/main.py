@@ -56,7 +56,7 @@ def main():
     #init_state = np.array([[2, 4, 3],
                        # [1, 0, 6],
                         #  [7,5, 8]])
-    print(init_state)
+    # print(init_state)
 
     p = EightPuzzle(init_state, goal_state)
 
