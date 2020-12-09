@@ -62,9 +62,6 @@ class Node:
         if isinstance(other, Node):
             return (self.table == other.table).all()
 
-        if isinstance(other, np.ndarray):
-            return (self.table == other).all()
-
         return False
 
     def __str__(self):

@@ -77,6 +77,6 @@ b = np.array([[1, 2, 3],
 
 a_node = Node(a, 0, 0, None)
 b_node = Node(b, 0, 0, None)
-print(a_node == b_node)
+print(b == b_node)
 # h_manhattan(a, goal_state)
 

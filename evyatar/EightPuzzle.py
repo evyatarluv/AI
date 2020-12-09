@@ -4,16 +4,24 @@ from .Node import Node
 import time
 
 
-def is_node_exist(table, existed_set):
+def is_node_exist(table, open_list, close_list):
     """
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
-    :param existed_set: set with the existed nodes
+    :param existed_list: list with the existed nodes
     :return: bool answer if the table appear in the existed list
     """
 
-    # Check if this table already exist
-    return table in existed_set
+    # Check if this table already exist in open list
+    for t in open_list:
+        if (t.table == table).all():
+            return True
+
+    # Check if this table already exist in close list
+    if tuple(table.flatten()) in close_list:
+        return True
+
+    return False
 
 
 def reconstruct_solution(solution):
@@ -96,20 +104,20 @@ class EightPuzzle:
                 # This children is not the goal state
                 else:
 
-                    if n not in (set(open_list) | close_list):
+                    if not is_node_exist(n, open_list, close_list):
 
                         lb = current_node.g_value + 1 + h_function(n, self.goal_state)
                         child_node = Node(n, current_node.g_value + 1, lb, current_node)
 
                         if lb < ub:
                             current_children.append(child_node)
-                        else:  # todo: think if needed
-                            close_list.append(child_node)
 
-            current_children.sort(key=lambda x: x.lb)
+            # Update open list with the relevant children
+            current_children.sort(key=lambda x: x.lb)  # sort all children
             open_list = current_children + open_list
-            # open_list.sort(key=lambda x: x.lb)
-            close_list.append(current_node)
+
+            # Pop the current node from the open list and add it to the close list
+            close_list.add(tuple(current_node.table.flatten()))
 
         self.solution = solution
 
