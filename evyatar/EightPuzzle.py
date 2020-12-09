@@ -4,7 +4,7 @@ from .Node import Node
 import time
 
 
-def is_node_exist(table, open_list, parent):
+def is_node_exist(table, open_set, parent):
     """
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
@@ -13,9 +13,8 @@ def is_node_exist(table, open_list, parent):
     """
 
     # Check if this table already exist in open list
-    for t in open_list:
-        if (t.table == table).all():
-            return True
+    if tuple(table.flatten()) in open_set:
+        return True
 
     # Look through all parents
     node = parent.parent
@@ -78,6 +77,7 @@ class EightPuzzle:
         # Init params
         solution = None
         open_list = [self.init_state]
+        open_set = {tuple(self.init_state.table.flatten())}
         ub = np.inf
         iterations = 0
 
@@ -85,6 +85,7 @@ class EightPuzzle:
 
             # Current node and current children of the node
             parent = open_list.pop(0)
+            open_set.remove(tuple(parent.table.flatten()))
             current_children = []
 
             # Iteration status
@@ -108,7 +109,7 @@ class EightPuzzle:
 
                 # This child is not the goal state
                 else:
-                    if not is_node_exist(child, open_list, parent):
+                    if not is_node_exist(child, open_set, parent):
                         g_value = parent.depth() + 1
                         lb = g_value + h_function(child, self.goal_state)
                         child_node = Node(child, lb, parent)
@@ -120,6 +121,9 @@ class EightPuzzle:
             # current_children.sort(key=lambda x: x.lb)  # sort all children
             open_list = current_children + open_list
             open_list.sort(key=lambda x: x.lb)
+
+            for c in current_children:
+                open_set.add(tuple(c.table.flatten()))
 
         self.solution = solution
 
