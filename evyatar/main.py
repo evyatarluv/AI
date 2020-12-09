@@ -71,7 +71,7 @@ def h_misplaced(table, goal_table):
 
 def main():
     # todo: seed = 34 - very hard -> 106,000 iter for crash (h_manhattan)
-    init_state = init_table(seed=67)
+    init_state = init_table(seed=34)
 
     print(init_state)
 

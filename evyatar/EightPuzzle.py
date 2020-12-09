@@ -78,7 +78,7 @@ class EightPuzzle:
         # Init params
         solution = None
         open_list = [self.init_state]
-        ub = 100
+        ub = np.inf
         iterations = 0
 
         while len(open_list) > 0:
@@ -109,7 +109,6 @@ class EightPuzzle:
                 # This child is not the goal state
                 else:
                     if not is_node_exist(child, open_list, parent):
-
                         g_value = parent.depth() + 1
                         lb = g_value + h_function(child, self.goal_state)
                         child_node = Node(child, lb, parent)
@@ -118,9 +117,9 @@ class EightPuzzle:
                             current_children.append(child_node)
 
             # Update open list with the relevant children
-            current_children.sort(key=lambda x: x.lb)  # sort all children
+            # current_children.sort(key=lambda x: x.lb)  # sort all children
             open_list = current_children + open_list
-            # open_list.sort(key=lambda x: x.lb)
+            open_list.sort(key=lambda x: x.lb)
 
         self.solution = solution
 
