@@ -1,23 +1,19 @@
 import copy
 import numpy as np
-from zohar.Node import Node
+from .Node import Node
 import time
 
 
-def is_node_exist(table, existed_list):
+def is_node_exist(table, existed_set):
     """
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
-    :param existed_list: list with the existed nodes
+    :param existed_set: set with the existed nodes
     :return: bool answer if the table appear in the existed list
     """
 
     # Check if this table already exist
-    for t in existed_list:
-        if (table == t.table).all():
-            return True
-
-    return False
+    return table in existed_set
 
 
 def reconstruct_solution(solution):
@@ -69,14 +65,14 @@ class EightPuzzle:
         # Init params
         solution = None
         open_list = [self.init_state]
-        close_list = []
-        ub = 33
+        close_list = set()
+        ub = 31
         iterations = 0
 
         while len(open_list) > 0:
 
             # Current node and current children of the node
-            current_node = open_list[0]
+            current_node = open_list.pop(0)
             current_children = []
 
             # Iteration status
@@ -100,16 +96,17 @@ class EightPuzzle:
                 # This children is not the goal state
                 else:
 
-                    if not is_node_exist(n, open_list + close_list):
+                    if n not in (set(open_list) | close_list):
 
                         lb = current_node.g_value + 1 + h_function(n, self.goal_state)
                         child_node = Node(n, current_node.g_value + 1, lb, current_node)
 
                         if lb < ub:
                             current_children.append(child_node)
+                        else:  # todo: think if needed
+                            close_list.append(child_node)
 
             current_children.sort(key=lambda x: x.lb)
-            open_list.pop(0)
             open_list = current_children + open_list
             # open_list.sort(key=lambda x: x.lb)
             close_list.append(current_node)

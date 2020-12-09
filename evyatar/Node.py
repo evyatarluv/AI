@@ -57,6 +57,16 @@ class Node:
 
         return depth
 
+    def __eq__(self, other):
+
+        if isinstance(other, Node):
+            return (self.table == other.table).all()
+
+        if isinstance(other, np.ndarray):
+            return (self.table == other).all()
+
+        return False
+
     def __str__(self):
 
         res = ''
