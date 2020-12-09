@@ -63,8 +63,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-    # pass
+    # main()
+    pass
 
 # Debug
 a = np.array([[1, 2, 3],
@@ -75,5 +75,8 @@ b = np.array([[1, 2, 3],
               [0, 4, 6],
               [7, 8, 5]])
 
-h_manhattan(a, goal_state)
+a_node = Node(a, 0, 0, None)
+b_node = Node(b, 0, 0, None)
+print(a_node == b_node)
+# h_manhattan(a, goal_state)
 
