@@ -78,7 +78,6 @@ class EightPuzzle:
         # Init params
         solution = None
         open_list = [self.init_state]
-        close_list = set()
         ub = 100
         iterations = 0
 
@@ -92,7 +91,7 @@ class EightPuzzle:
             iterations += 1
             if iterations % 100 == 0:
                 print('-- Status --')
-                print('Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
+                print('Open List: {}, Iterations: {}'.format(len(open_list), iterations))
                 print('Depth: {}, UB: {}'.format(parent.depth(), ub))
 
             # For each available children
@@ -113,7 +112,7 @@ class EightPuzzle:
 
                         g_value = parent.depth() + 1
                         lb = g_value + h_function(child, self.goal_state)
-                        child_node = Node(child, g_value, parent)
+                        child_node = Node(child, lb, parent)
 
                         if lb < ub:
                             current_children.append(child_node)
@@ -122,9 +121,6 @@ class EightPuzzle:
             current_children.sort(key=lambda x: x.lb)  # sort all children
             open_list = current_children + open_list
             # open_list.sort(key=lambda x: x.lb)
-
-            # Update close list
-            close_list.add(tuple(parent.table.flatten()))
 
         self.solution = solution
 

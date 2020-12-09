@@ -9,7 +9,6 @@ goal_state = np.array([[1, 2, 3],
 
 
 def init_table(seed=None):
-
     """
     This function create initial state of the 8-puzzle
     :param seed: seed to the random function, optional
@@ -34,7 +33,6 @@ def h_manhattan(table, goal_table):
     manhattan_sum = 0
 
     for i in range(1, 9):
-
         # Get position on current table
         table_pos = np.where(table == i)
 
@@ -49,9 +47,31 @@ def h_manhattan(table, goal_table):
     return manhattan_sum
 
 
+def h_misplaced(table, goal_table):
+    """
+    h function which count the number of misplaced number in a given state
+    :param table: current state, ndarray
+    :param goal_table: goal state, ndarray
+    :return: number of misplaced, int
+    """
+
+    # Flat both tables and change to list
+    goal_table = list(goal_table.flatten())
+    table = list(table.flatten())
+
+    misplaced = 0
+
+    for i in range(1, 9):
+        # if the i number is misplaced
+        if goal_table.index(i) != table.index(i):
+            misplaced += 1
+
+    return misplaced
+
+
 def main():
-    # todo: seed = 34 - very hard
-    init_state = init_table(seed=34)
+    # todo: seed = 34 - very hard -> 106,000 iter for crash (h_manhattan)
+    init_state = init_table(seed=67)
 
     print(init_state)
 
@@ -68,9 +88,9 @@ if __name__ == '__main__':
     # pass
 
 # Debug
-a = np.array([[1, 2, 3],
-              [0, 4, 6],
-              [7, 8, 5]])
+a = np.array([[5, 0, 8],
+              [4, 2, 1],
+              [7, 3, 6]])
 
 b = np.array([[1, 2, 3],
               [0, 4, 6],
@@ -78,5 +98,4 @@ b = np.array([[1, 2, 3],
 
 a_node = Node(a, 0, None)
 b_node = Node(b, 0, None)
-# h_manhattan(a, goal_state)
-
+h_manhattan(a, goal_state)
