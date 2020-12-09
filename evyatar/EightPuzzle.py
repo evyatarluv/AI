@@ -4,11 +4,11 @@ from .Node import Node
 import time
 
 
-def is_node_exist(table, open_list, close_list):
+def is_node_exist(table, open_list, parent):
     """
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
-    :param existed_list: list with the existed nodes
+    :param open_list: list with the existed nodes
     :return: bool answer if the table appear in the existed list
     """
 
@@ -17,21 +17,26 @@ def is_node_exist(table, open_list, close_list):
         if (t.table == table).all():
             return True
 
-    # Check if this table already exist in close list
-    if tuple(table.flatten()) in close_list:
-        return True
+    # Look through all parents
+    node = parent.parent
+    while node is not None:
+
+        if (table == node.table).all():
+            return True
+        else:
+            node = node.parent
 
     return False
 
 
 def reconstruct_solution(solution):
 
-    solution_list = [solution.table]
+    solution_list = [solution]
     node = solution.parent
 
     while node is not None:
 
-        solution_list.insert(0, node.table)
+        solution_list.insert(0, node)
         node = node.parent
 
     return solution_list
@@ -41,7 +46,7 @@ class EightPuzzle:
 
     def __init__(self, init_state, goal_state):
 
-        self.init_state = Node(init_state, 0, 0, None)
+        self.init_state = Node(init_state, 0, None)
 
         self.goal_state = goal_state
 
@@ -74,13 +79,13 @@ class EightPuzzle:
         solution = None
         open_list = [self.init_state]
         close_list = set()
-        ub = 31
+        ub = 100
         iterations = 0
 
         while len(open_list) > 0:
 
             # Current node and current children of the node
-            current_node = open_list.pop(0)
+            parent = open_list.pop(0)
             current_children = []
 
             # Iteration status
@@ -88,26 +93,27 @@ class EightPuzzle:
             if iterations % 100 == 0:
                 print('-- Status --')
                 print('Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
-                print('Depth: {}, UB: {}'.format(current_node.depth(), ub))
+                print('Depth: {}, UB: {}'.format(parent.depth(), ub))
 
             # For each available children
-            for n in current_node.expand():
+            for child in parent.expand():
 
                 # If this children is the goal state
-                if (n == self.goal_state).all():
+                if (child == self.goal_state).all():
 
                     # If this solution is better then the current solution
-                    if current_node.g_value + 1 < ub:
-                        ub = current_node.g_value + 1
-                        solution = Node(n, ub, ub, current_node)
+                    steps = parent.depth() + 1
+                    if steps < ub:
+                        ub = steps
+                        solution = Node(child, ub, parent)
 
-                # This children is not the goal state
+                # This child is not the goal state
                 else:
+                    if not is_node_exist(child, open_list, parent):
 
-                    if not is_node_exist(n, open_list, close_list):
-
-                        lb = current_node.g_value + 1 + h_function(n, self.goal_state)
-                        child_node = Node(n, current_node.g_value + 1, lb, current_node)
+                        g_value = parent.depth() + 1
+                        lb = g_value + h_function(child, self.goal_state)
+                        child_node = Node(child, g_value, parent)
 
                         if lb < ub:
                             current_children.append(child_node)
@@ -115,9 +121,10 @@ class EightPuzzle:
             # Update open list with the relevant children
             current_children.sort(key=lambda x: x.lb)  # sort all children
             open_list = current_children + open_list
+            # open_list.sort(key=lambda x: x.lb)
 
-            # Pop the current node from the open list and add it to the close list
-            close_list.add(tuple(current_node.table.flatten()))
+            # Update close list
+            close_list.add(tuple(parent.table.flatten()))
 
         self.solution = solution
 

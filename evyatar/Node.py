@@ -4,11 +4,9 @@ import copy
 
 class Node:
 
-    def __init__(self, table, g_value, lb, parent):
+    def __init__(self, table, lb, parent):
 
         self.table = table
-
-        self.g_value = g_value
 
         self.lb = lb
 
@@ -48,7 +46,7 @@ class Node:
 
     def depth(self):
 
-        depth = 1
+        depth = 0
         p = self.parent
 
         while p is not None:
