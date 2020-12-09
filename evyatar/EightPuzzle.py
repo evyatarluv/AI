@@ -4,20 +4,16 @@ from .Node import Node
 import time
 
 
-def is_node_exist(table, existed_list):
+def is_node_exist(table, existed_set):
     """
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
-    :param existed_list: list with the existed nodes
+    :param existed_set: set with the existed nodes
     :return: bool answer if the table appear in the existed list
     """
 
     # Check if this table already exist
-    for t in existed_list:
-        if (table == t.table).all():
-            return True
-
-    return False
+    return table in existed_set
 
 
 def reconstruct_solution(solution):
@@ -69,7 +65,7 @@ class EightPuzzle:
         # Init params
         solution = None
         open_list = [self.init_state]
-        close_list = []
+        close_list = set()
         ub = 31
         iterations = 0
 
@@ -100,7 +96,7 @@ class EightPuzzle:
                 # This children is not the goal state
                 else:
 
-                    if not is_node_exist(n, open_list + close_list):
+                    if n not in (set(open_list) | close_list):
 
                         lb = current_node.g_value + 1 + h_function(n, self.goal_state)
                         child_node = Node(n, current_node.g_value + 1, lb, current_node)

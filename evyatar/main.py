@@ -63,8 +63,8 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    pass
+    main()
+    # pass
 
 # Debug
 a = np.array([[1, 2, 3],
