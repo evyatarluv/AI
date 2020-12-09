@@ -70,7 +70,7 @@ class EightPuzzle:
         solution = None
         open_list = [self.init_state]
         close_list = []
-        ub = 31
+        ub = 33
         iterations = 0
 
         while len(open_list) > 0:

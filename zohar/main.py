@@ -50,9 +50,12 @@ def h_manhattan(table, goal_table):
 
 
 def main():
-    # todo: seed = 34
-    init_state = init_table(seed=23)
-
+    # todo: seed = 34 - hard
+    # todo: seed = 32 - none
+    init_state = init_table(seed=32)
+    #init_state = np.array([[2, 4, 3],
+                       # [1, 0, 6],
+                        #  [7,5, 8]])
     print(init_state)
 
     p = EightPuzzle(init_state, goal_state)
