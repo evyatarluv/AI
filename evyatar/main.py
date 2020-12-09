@@ -50,18 +50,22 @@ def h_manhattan(table, goal_table):
 
 
 def main():
+    # todo: seed = 34
+    init_state = init_table(seed=23)
 
-    init_state = init_table()
+    print(init_state)
 
     p = EightPuzzle(init_state, goal_state)
 
     sol = p.solve('BnB', h_manhattan)
-    print(len(sol))
+    print(sol[-1])
+    print('Solution: {}'.format(len(sol)))
 
 
 if __name__ == '__main__':
     main()
     # pass
+
 # Debug
 a = np.array([[1, 2, 3],
               [0, 4, 6],
@@ -71,6 +75,5 @@ b = np.array([[1, 2, 3],
               [0, 4, 6],
               [7, 8, 5]])
 
-print(Node(a, 0, 0, None))
 h_manhattan(a, goal_state)
 
