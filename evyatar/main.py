@@ -77,14 +77,14 @@ def h_misplaced(table, goal_table):
 
 
 def main():
-    # todo: seed = 34 - very hard -> 106,000 iter for crash (h_manhattan)
-    init_state = init_table(seed=12)
 
-    print(init_state)
+    init_state = init_table()
 
     p = EightPuzzle(init_state, goal_state)
 
     sol = p.solve('BnB', h_manhattan)
+
+    # Print solution
     for i in sol:
         print(i)
     print('\n\nSolution: {}'.format(len(sol) - 1))

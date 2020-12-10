@@ -51,24 +51,27 @@ class EightPuzzle:
 
         self.solution = None
 
-    def solve(self, method, h_function):
+    def solve(self, algorithm, h_function):
         """
         This method get an algorithm name to solve the eight-puzzle, and heuristic function.
         The method return a solution.
-        :param method: str, algorithm name
+        :param algorithm: str, algorithm name
         :param h_function: function which get current table (matrix) and goal state (matrix)
                             and return scalar
         :return: solution as Node object
         """
 
-        if method == 'BnB':
+        print('Using {} to solve the 8-puzzle...'.format(algorithm))
+        print('Init table: \n{}'.format(self.init_state))
+
+        if algorithm == 'BnB':
             self.bnb_solve(h_function)
 
-        elif method == 'A*':
+        elif algorithm == 'A*':
             self.a_star_solve(h_function)
 
         else:
-            raise NameError('Unused method, please choose `BnB` or `A*`.')
+            raise NameError('Unused algorithm, please choose `BnB` or `A*`.')
 
         return reconstruct_solution(self.solution)
 
@@ -83,45 +86,45 @@ class EightPuzzle:
 
         while len(open_list) > 0:
 
-            # Current node and current children of the node
+            # Get the current parent node for this iteration
             parent = open_list.pop(0)
             open_set.remove(tuple(parent.table.flatten()))
             current_children = []
 
+            # todo: need just close set
+            parent_depth = parent.depth()
+
             # Iteration status
             iterations += 1
             if iterations % 100 == 0:
-                print('-- Status --')
-                print('Open List: {}, Iterations: {}'.format(len(open_list), iterations))
-                print('Depth: {}, UB: {}'.format(parent.depth(), ub))
+                print('---- Status ----')
+                print('Open List: {}, Iterations: {}, UB: {}'.format(len(open_list), iterations, ub))
 
-            # For each available children
+            # Branch
             for child in parent.expand():
 
                 # If this children is the goal state
                 if (child == self.goal_state).all():
 
                     # If this solution is better then the current solution
-                    steps = parent.depth() + 1
-                    if steps < ub:
-                        ub = steps
+                    if parent_depth + 1 < ub:
+                        ub = parent_depth + 1
                         solution = Node(child, ub, parent)
 
-                # This child is not the goal state
+                # Bound
                 else:
                     if not is_node_exist(child, open_set, parent):
-                        g_value = parent.depth() + 1
-                        lb = g_value + h_function(child, self.goal_state)
-                        child_node = Node(child, lb, parent)
+
+                        lb = parent_depth + 1 + h_function(child, self.goal_state)
 
                         if lb < ub:
-                            current_children.append(child_node)
+                            current_children.append(Node(child, lb, parent))
 
             # Update open list with the relevant children
-            # current_children.sort(key=lambda x: x.lb)  # sort all children
             open_list = current_children + open_list
             open_list.sort(key=lambda x: x.lb)
 
+            # Update open set
             for c in current_children:
                 open_set.add(tuple(c.table.flatten()))
 
