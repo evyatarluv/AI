@@ -8,27 +8,10 @@ goal_state = np.array([[1, 2, 3],
                        [7, 8, 0]])
 
 
-def solvable(table):
-    """
-    Check if a given init table is solvable
-    :param table: init table
-    :return: bool answer
-    """
-
-    count = 0
-    table = table.flatten()
-
-    for i in range(len(table)):
-        for j in range(i + 1, len(table)):
-            if (table[i] > table[j]) & (table[j] != 0):
-                count += 1
-
-    return count % 2 == 0
-
-
 def init_table(seed=None):
     """
-    This function create initial state of the 8-table
+    This function create initial state of the 8-table.
+    he function return only solvable init table.
     :param seed: seed to the random function, optional
     :return:
     """
@@ -36,7 +19,13 @@ def init_table(seed=None):
     if seed is not None:
         rnd.seed(seed)
 
-    return np.array(rnd.sample(range(9), 9)).reshape((3, 3))
+    table = np.array(rnd.sample(range(9), 9)).reshape((3, 3))
+
+    while not EightPuzzle.is_solvable(table):
+
+        table = np.array(rnd.sample(range(9), 9)).reshape((3, 3))
+
+    return table
 
 
 def h_manhattan(table, goal_table):
@@ -102,8 +91,8 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    pass
+    main()
+    # pass
 
 # Debug
 a = np.array([[5, 0, 8],
@@ -114,8 +103,6 @@ b = np.array([[1, 2, 3],
               [0, 4, 6],
               [7, 8, 5]])
 
-print(solvable(np.array([1,8,2,0,4,3,7,6,5]).reshape((3, 3))))
-print(solvable(np.array([8,1,2,0,4,3,7,6,5]).reshape((3, 3))))
 a_node = Node(a, 0, None)
 b_node = Node(b, 0, None)
 h_manhattan(a, goal_state)

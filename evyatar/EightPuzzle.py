@@ -129,3 +129,21 @@ class EightPuzzle:
 
     def a_star_solve(self, h_function):
         pass
+
+    @staticmethod
+    def is_solvable(table):
+        """
+        Check if a given init table is solvable
+        :param table: init table
+        :return: bool answer
+        """
+
+        count = 0
+        table = table.flatten()
+
+        for i in range(len(table)):
+            for j in range(i + 1, len(table)):
+                if (table[i] > table[j]) & (table[j] != 0):
+                    count += 1
+
+        return count % 2 == 0
