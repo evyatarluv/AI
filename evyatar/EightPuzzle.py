@@ -76,11 +76,17 @@ class EightPuzzle:
         return reconstruct_solution(self.solution)
 
     def bnb_solve(self, h_function):
+        """
+        This method implement Branch & Bound algorithm.
+        The B&B implementation using priority queue for the open list.
+        :param h_function: heuristic function for the LB
+        :return: solution (Node)
+        """
 
         # Init params
         solution = None
         open_list = [self.init_state]
-        open_set = {tuple(self.init_state.table.flatten())}
+        close_set = set()
         ub = np.inf
         iterations = 0
 
@@ -88,10 +94,7 @@ class EightPuzzle:
 
             # Get the current parent node for this iteration
             parent = open_list.pop(0)
-            open_set.remove(tuple(parent.table.flatten()))
             current_children = []
-
-            # todo: need just close set
             parent_depth = parent.depth()
 
             # Iteration status
@@ -113,20 +116,19 @@ class EightPuzzle:
 
                 # Bound
                 else:
-                    if not is_node_exist(child, open_set, parent):
+                    if tuple(child.flatten()) not in close_set:
 
                         lb = parent_depth + 1 + h_function(child, self.goal_state)
 
                         if lb < ub:
                             current_children.append(Node(child, lb, parent))
 
-            # Update open list with the relevant children
+            # Update open list
             open_list = current_children + open_list
             open_list.sort(key=lambda x: x.lb)
 
-            # Update open set
-            for c in current_children:
-                open_set.add(tuple(c.table.flatten()))
+            # Update close set
+            close_set.add(tuple(parent.table.flatten()))
 
         self.solution = solution
 
