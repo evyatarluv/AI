@@ -58,7 +58,7 @@ class EightPuzzle:
         :param algorithm: str, algorithm name
         :param h_function: function which get current table (matrix) and goal state (matrix)
                             and return scalar
-        :return: solution as Node object
+        :return: solution as Node object or None if there is no solution
         """
 
         print('Using {} to solve the 8-puzzle...'.format(algorithm))
