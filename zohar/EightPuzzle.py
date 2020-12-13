@@ -4,30 +4,38 @@ from .Node import Node
 import time
 
 
-def is_node_exist(table, existed_list):
+def is_node_exist(table, open_set, parent):
     """
     This function get two lists and return if the table is in on of those lists
     :param table: ndarray represent the table
-    :param existed_list: list with the existed nodes
+    :param open_list: list with the existed nodes
     :return: bool answer if the table appear in the existed list
     """
 
-    # Check if this table already exist
-    for t in existed_list:
-        if (table == t.table).all():
+    # Check if this table already exist in open list
+    if tuple(table.flatten()) in open_set:
+        return True
+
+    # Look through all parents
+    node = parent.parent
+    while node is not None:
+
+        if (table == node.table).all():
             return True
+        else:
+            node = node.parent
 
     return False
 
 
 def reconstruct_solution(solution):
 
-    solution_list = [solution.table]
+    solution_list = [solution]
     node = solution.parent
 
     while node is not None:
 
-        solution_list.insert(0, node.table)
+        solution_list.insert(0, node)
         node = node.parent
 
     return solution_list
@@ -37,85 +45,110 @@ class EightPuzzle:
 
     def __init__(self, init_state, goal_state):
 
-        self.init_state = Node(init_state, 0, 0, None)
+        self.init_state = Node(init_state, 0, None)
 
         self.goal_state = goal_state
 
         self.solution = None
 
-    def solve(self, method, h_function):
+    def solve(self, algorithm, h_function):
         """
         This method get an algorithm name to solve the eight-puzzle, and heuristic function.
         The method return a solution.
-        :param method: str, algorithm name
+        :param algorithm: str, algorithm name
         :param h_function: function which get current table (matrix) and goal state (matrix)
                             and return scalar
         :return: solution as Node object
         """
 
-        if method == 'BnB':
+        print('Using {} to solve the 8-puzzle...'.format(algorithm))
+        print('Init table: \n{}'.format(self.init_state))
+
+        if algorithm == 'BnB':
             self.bnb_solve(h_function)
 
-        elif method == 'A*':
+        elif algorithm == 'A*':
             self.a_star_solve(h_function)
 
         else:
-            raise NameError('Unused method, please choose `BnB` or `A*`.')
+            raise NameError('Unused algorithm, please choose `BnB` or `A*`.')
 
         return reconstruct_solution(self.solution)
 
     def bnb_solve(self, h_function):
+        """
+        This method implement Branch & Bound algorithm.
+        The B&B implementation using priority queue for the open list.
+        :param h_function: heuristic function for the LB
+        :return: solution (Node)
+        """
 
         # Init params
         solution = None
         open_list = [self.init_state]
-        close_list = []
-        ub = 31
+        close_set = set()
+        ub = np.inf
         iterations = 0
 
         while len(open_list) > 0:
 
-            # Current node and current children of the node
-            current_node = open_list.pop(0)
+            # Get the current parent node for this iteration
+            parent = open_list.pop(0)
             current_children = []
+            parent_depth = parent.depth()
 
             # Iteration status
             iterations += 1
             if iterations % 100 == 0:
-                print('-- Status --')
-                print('Open List: {}, Close List: {}, Iterations: {}'.format(len(open_list), len(close_list), iterations))
-                print('Depth: {}, UB: {}'.format(current_node.depth(), ub))
+                print('---- Status ----')
+                print('Open List: {}, Iterations: {}, UB: {}'.format(len(open_list), iterations, ub))
 
-            # For each available children
-            for n in current_node.expand():
+            # Branch
+            for child in parent.expand():
 
                 # If this children is the goal state
-                if (n == self.goal_state).all():
+                if (child == self.goal_state).all():
 
                     # If this solution is better then the current solution
-                    if current_node.g_value + 1 < ub:
-                        ub = current_node.g_value + 1
-                        solution = Node(n, ub, ub, current_node)
+                    if parent_depth + 1 < ub:
+                        ub = parent_depth + 1
+                        solution = Node(child, ub, parent)
 
-                # This children is not the goal state
+                # Bound
                 else:
+                    if tuple(child.flatten()) not in close_set:
 
-                    if not is_node_exist(n, open_list + close_list):
-
-                        lb = current_node.g_value + 1 + h_function(n, self.goal_state)
-                        child_node = Node(n, current_node.g_value + 1, lb, current_node)
+                        lb = parent_depth + 1 + h_function(child, self.goal_state)
 
                         if lb < ub:
-                            current_children.append(child_node)
-                        else:  # todo: think if needed
-                            close_list.append(child_node)
+                            current_children.append(Node(child, lb, parent))
 
-            current_children.sort(key=lambda x: x.lb)
+            # Update open list
             open_list = current_children + open_list
-            # open_list.sort(key=lambda x: x.lb)
-            close_list.append(current_node)
+            open_list.sort(key=lambda x: x.lb)
+
+            # Update close set
+            close_set.add(tuple(parent.table.flatten()))
 
         self.solution = solution
 
     def a_star_solve(self, h_function):
         pass
+
+    @staticmethod
+    def is_solvable(table):
+        """
+        Check if a given init table is solvable
+        :param table: init table
+        :return: bool answer
+        """
+
+        count = 0
+        table = table.flatten()
+
+        for i in range(len(table)):
+            for j in range(i + 1, len(table)):
+                if (table[i] > table[j]) & (table[j] != 0):
+                    count += 1
+
+        return count % 2 == 0
