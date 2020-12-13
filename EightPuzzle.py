@@ -129,9 +129,9 @@ class EightPuzzle:
             g_value = parent.depth() + 1
 
             # Iteration status
-            iterations += 1
-            if iterations % 100 == 0:
-                print('\rIterations: {}, Open List: {}'.format(iterations, len(open_list)))
+            # iterations += 1
+            # if iterations % 100 == 0:
+            #     print('\rIterations: {}, Open List: {}'.format(iterations, len(open_list)))
 
             # Expand node
             for child in parent.expand():
