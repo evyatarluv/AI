@@ -2,30 +2,7 @@ import copy
 import numpy as np
 from .Node import Node
 import time
-
-
-def is_node_exist(table, open_set, parent):
-    """
-    This function get two lists and return if the table is in on of those lists
-    :param table: ndarray represent the table
-    :param open_list: list with the existed nodes
-    :return: bool answer if the table appear in the existed list
-    """
-
-    # Check if this table already exist in open list
-    if tuple(table.flatten()) in open_set:
-        return True
-
-    # Look through all parents
-    node = parent.parent
-    while node is not None:
-
-        if (table == node.table).all():
-            return True
-        else:
-            node = node.parent
-
-    return False
+import random as rnd
 
 
 def reconstruct_solution(solution):
@@ -58,7 +35,7 @@ class EightPuzzle:
         :param algorithm: str, algorithm name
         :param h_function: function which get current table (matrix) and goal state (matrix)
                             and return scalar
-        :return: solution as Node object
+        :return: solution as Node object or None if there is no solution
         """
 
         print('Using {} to solve the 8-puzzle...'.format(algorithm))
@@ -100,6 +77,7 @@ class EightPuzzle:
             # Iteration status
             iterations += 1
             if iterations % 100 == 0:
+                # todo: print when the UB change
                 print('---- Status ----')
                 print('Open List: {}, Iterations: {}, UB: {}'.format(len(open_list), iterations, ub))
 
@@ -133,7 +111,52 @@ class EightPuzzle:
         self.solution = solution
 
     def a_star_solve(self, h_function):
-        pass
+
+        """
+        This method implement A* algorithm.
+        :param h_function: heuristic function for f function.
+        :return: solution (Node)
+        """
+
+        # Init params
+        solution = None
+        open_list = [self.init_state]
+        close_set = set()
+        iterations = 0
+
+        while len(open_list) > 0:
+
+            # Get the current parent node for this iteration
+            parent = open_list.pop(0)
+            g_value = parent.depth() + 1
+
+            # Iteration status
+            iterations += 1
+            if iterations % 100 == 0:
+                print('---- Status ----')
+                print('Open List: {}, Iterations: {}'.format(len(open_list), iterations))
+
+            # Expand node
+            for child in parent.expand():
+
+                # If this children is the goal state - this is an optimal solution
+                if (child == self.goal_state).all():
+                    self.solution = Node(child, g_value, parent)
+                    return
+
+                # If not a solution
+                else:
+                    if tuple(child.flatten()) not in close_set:
+
+                        open_list.append(Node(child, g_value + h_function(child, self.goal_state), parent))
+
+            # Best-First: sort the open list
+            open_list.sort(key=lambda x: x.lb)
+
+            # Update close set
+            close_set.add(tuple(parent.table.flatten()))
+
+        self.solution = solution
 
     @staticmethod
     def is_solvable(table):
@@ -152,3 +175,22 @@ class EightPuzzle:
                     count += 1
 
         return count % 2 == 0
+
+    @staticmethod
+    def init_table(seed=None):
+        """
+        This function create initial state of the 8-table.
+        he function return only solvable init table.
+        :param seed: seed to the random function, optional
+        :return:
+        """
+
+        if seed is not None:
+            rnd.seed(seed)
+
+        table = np.array(rnd.sample(range(9), 9)).reshape((3, 3))
+
+        while not EightPuzzle.is_solvable(table):
+            table = np.array(rnd.sample(range(9), 9)).reshape((3, 3))
+
+        return table
