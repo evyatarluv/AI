@@ -2,30 +2,7 @@ import copy
 import numpy as np
 from .Node import Node
 import time
-
-
-def is_node_exist(table, open_set, parent):
-    """
-    This function get two lists and return if the table is in on of those lists
-    :param table: ndarray represent the table
-    :param open_list: list with the existed nodes
-    :return: bool answer if the table appear in the existed list
-    """
-
-    # Check if this table already exist in open list
-    if tuple(table.flatten()) in open_set:
-        return True
-
-    # Look through all parents
-    node = parent.parent
-    while node is not None:
-
-        if (table == node.table).all():
-            return True
-        else:
-            node = node.parent
-
-    return False
+import random as rnd
 
 
 def reconstruct_solution(solution):
@@ -198,3 +175,22 @@ class EightPuzzle:
                     count += 1
 
         return count % 2 == 0
+
+    @staticmethod
+    def init_table(seed=None):
+        """
+        This function create initial state of the 8-table.
+        he function return only solvable init table.
+        :param seed: seed to the random function, optional
+        :return:
+        """
+
+        if seed is not None:
+            rnd.seed(seed)
+
+        table = np.array(rnd.sample(range(9), 9)).reshape((3, 3))
+
+        while not EightPuzzle.is_solvable(table):
+            table = np.array(rnd.sample(range(9), 9)).reshape((3, 3))
+
+        return table
