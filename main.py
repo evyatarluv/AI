@@ -11,19 +11,18 @@ goal_state = np.array([[1, 2, 3],
 
 
 def main():
-
     """
     The main function initialize a random (solvable) table and return a solution.
     :return:
     """
 
     # Init table
-    init_state = EightPuzzle.init_table()
+    init_state = EightPuzzle.init_table(seed=51)
 
     # Solve the init table
     puzzle = EightPuzzle(init_state, goal_state)
 
-    solution = puzzle.solve('BnB', h_manhattan)
+    solution = puzzle.solve('A*', h_misplaced)
 
     # Print solution
     print('Solution Way:')
@@ -38,7 +37,7 @@ def init_seeds(amount):
     :return: list with all the seeds
     """
 
-    i = 5
+    i = 48
     seeds = []
 
     while len(seeds) < amount:
@@ -46,7 +45,6 @@ def init_seeds(amount):
         rnd_table = EightPuzzle.init_table(seed=i)
 
         if EightPuzzle.is_solvable(rnd_table):
-
             seeds.append(i)
 
         i += 1
@@ -55,7 +53,6 @@ def init_seeds(amount):
 
 
 def compare_algorithms():
-
     """
     The function compare between A* and B&B algorithms using two different heuristics.
     Both algorithms compare according to 20 different init tables.
@@ -67,31 +64,40 @@ def compare_algorithms():
     a_star = {'manhattan': [], 'misplace': []}
     bnb = {'manhattan': [], 'misplace': []}
 
-    for s in tqdm(seeds):
+    for s in seeds:
+
+        print('---- Seed = {} ----'.format(s))
 
         init_state = EightPuzzle.init_table(seed=s)
 
         puzzle = EightPuzzle(init_state, goal_state)
 
         # A* with manhattan
+        print('A* & Manhattan')
         start = time()
         puzzle.solve('A*', h_manhattan)
         a_star['manhattan'].append(time() - start)
 
         # A* with misplace
+        print('A* & Misplace')
         start = time()
         puzzle.solve('A*', h_misplaced)
         a_star['misplace'].append(time() - start)
 
         # B&B with manhattan
+        print('B&B & Manhattan')
         start = time()
         puzzle.solve('BnB', h_manhattan)
         bnb['manhattan'].append(time() - start)
 
         # B&B with misplace
+        print('B&B & Misplace')
         start = time()
         puzzle.solve('BnB', h_misplaced)
         bnb['misplace'].append(time() - start)
+
+    print('A*: {}'.format(a_star))
+    print('BnB: {}'.format(bnb))
 
 
 if __name__ == '__main__':
@@ -99,3 +105,5 @@ if __name__ == '__main__':
     # main()
 
     compare_algorithms()
+
+

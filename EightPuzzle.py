@@ -130,8 +130,8 @@ class EightPuzzle:
 
             # Iteration status
             iterations += 1
-            if iterations > 5000 == 0:
-                print('This is a taught one...', end='\r')
+            if iterations % 100 == 0:
+                print('\rIterations: {}, Open List: {}'.format(iterations, len(open_list)))
 
             # Expand node
             for child in parent.expand():
