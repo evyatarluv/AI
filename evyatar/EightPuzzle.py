@@ -100,6 +100,7 @@ class EightPuzzle:
             # Iteration status
             iterations += 1
             if iterations % 100 == 0:
+                # todo: print when the UB change
                 print('---- Status ----')
                 print('Open List: {}, Iterations: {}, UB: {}'.format(len(open_list), iterations, ub))
 
@@ -133,7 +134,52 @@ class EightPuzzle:
         self.solution = solution
 
     def a_star_solve(self, h_function):
-        pass
+
+        """
+        This method implement A* algorithm.
+        :param h_function: heuristic function for f function.
+        :return: solution (Node)
+        """
+
+        # Init params
+        solution = None
+        open_list = [self.init_state]
+        close_set = set()
+        iterations = 0
+
+        while len(open_list) > 0:
+
+            # Get the current parent node for this iteration
+            parent = open_list.pop(0)
+            g_value = parent.depth() + 1
+
+            # Iteration status
+            iterations += 1
+            if iterations % 100 == 0:
+                print('---- Status ----')
+                print('Open List: {}, Iterations: {}'.format(len(open_list), iterations))
+
+            # Expand node
+            for child in parent.expand():
+
+                # If this children is the goal state - this is an optimal solution
+                if (child == self.goal_state).all():
+                    self.solution = Node(child, g_value, parent)
+                    return
+
+                # If not a solution
+                else:
+                    if tuple(child.flatten()) not in close_set:
+
+                        open_list.append(Node(child, g_value + h_function(child, self.goal_state), parent))
+
+            # Best-First: sort the open list
+            open_list.sort(key=lambda x: x.lb)
+
+            # Update close set
+            close_set.add(tuple(parent.table.flatten()))
+
+        self.solution = solution
 
     @staticmethod
     def is_solvable(table):

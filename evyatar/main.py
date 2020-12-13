@@ -82,7 +82,7 @@ def main():
 
     p = EightPuzzle(init_state, goal_state)
 
-    sol = p.solve('BnB', h_manhattan)
+    sol = p.solve('A*', h_misplaced)
 
     # Print solution
     for i in sol:
@@ -95,14 +95,20 @@ if __name__ == '__main__':
     # pass
 
 # Debug
-a = np.array([[5, 0, 8],
-              [4, 2, 1],
-              [7, 3, 6]])
+a = np.array([[2, 6, 0],
+              [8, 1, 4],
+              [5, 3, 7]])
 
 b = np.array([[1, 2, 3],
               [0, 4, 6],
               [7, 8, 5]])
 
+
+p = EightPuzzle(a, goal_state)
+sol = p.solve('BnB', h_misplaced)
+for i in sol:
+    print(i)
+print('\n\nSolution: {}'.format(len(sol) - 1))
 a_node = Node(a, 0, None)
 b_node = Node(b, 0, None)
 h_manhattan(a, goal_state)
