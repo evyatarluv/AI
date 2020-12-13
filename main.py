@@ -1,8 +1,9 @@
 import numpy as np
-from Node import Node
 from EightPuzzle import EightPuzzle
 import random as rnd
 from heuristics import *
+from time import time
+from tqdm import tqdm
 
 goal_state = np.array([[1, 2, 3],
                        [4, 5, 6],
@@ -63,11 +64,38 @@ def compare_algorithms():
 
     seeds = init_seeds(amount=20)
 
+    a_star = {'manhattan': [], 'misplace': []}
+    bnb = {'manhattan': [], 'misplace': []}
 
+    for s in tqdm(seeds):
+
+        init_state = EightPuzzle.init_table(seed=s)
+
+        puzzle = EightPuzzle(init_state, goal_state)
+
+        # A* with manhattan
+        start = time()
+        puzzle.solve('A*', h_manhattan)
+        a_star['manhattan'].append(time() - start)
+
+        # A* with misplace
+        start = time()
+        puzzle.solve('A*', h_misplaced)
+        a_star['misplace'].append(time() - start)
+
+        # B&B with manhattan
+        start = time()
+        puzzle.solve('BnB', h_manhattan)
+        bnb['manhattan'].append(time() - start)
+
+        # B&B with misplace
+        start = time()
+        puzzle.solve('BnB', h_misplaced)
+        bnb['misplace'].append(time() - start)
 
 
 if __name__ == '__main__':
 
-    main()
+    # main()
 
-    # compare_algorithms()
+    compare_algorithms()

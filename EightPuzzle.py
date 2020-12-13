@@ -38,8 +38,8 @@ class EightPuzzle:
         :return: solution as Node object or None if there is no solution
         """
 
-        print('Using {} to solve the 8-puzzle...'.format(algorithm))
-        print('Init table: \n{}'.format(self.init_state))
+        # print('Using {} to solve the 8-puzzle...'.format(algorithm))
+        # print('Init table: \n{}'.format(self.init_state))
 
         if algorithm == 'BnB':
             self.bnb_solve(h_function)
