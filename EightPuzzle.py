@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from .Node import Node
+from Node import Node
 import time
 import random as rnd
 
@@ -38,8 +38,8 @@ class EightPuzzle:
         :return: solution as Node object or None if there is no solution
         """
 
-        print('Using {} to solve the 8-puzzle...'.format(algorithm))
-        print('Init table: \n{}'.format(self.init_state))
+        # print('Using {} to solve the 8-puzzle...'.format(algorithm))
+        # print('Init table: \n{}'.format(self.init_state))
 
         if algorithm == 'BnB':
             self.bnb_solve(h_function)
@@ -76,10 +76,8 @@ class EightPuzzle:
 
             # Iteration status
             iterations += 1
-            if iterations % 100 == 0:
-                # todo: print when the UB change
-                print('---- Status ----')
-                print('Open List: {}, Iterations: {}, UB: {}'.format(len(open_list), iterations, ub))
+            if iterations > 5000 == 0:
+                print('This is a taught one...', end='\r')
 
             # Branch
             for child in parent.expand():
@@ -131,10 +129,9 @@ class EightPuzzle:
             g_value = parent.depth() + 1
 
             # Iteration status
-            iterations += 1
-            if iterations % 100 == 0:
-                print('---- Status ----')
-                print('Open List: {}, Iterations: {}'.format(len(open_list), iterations))
+            # iterations += 1
+            # if iterations % 100 == 0:
+            #     print('\rIterations: {}, Open List: {}'.format(iterations, len(open_list)))
 
             # Expand node
             for child in parent.expand():
@@ -180,7 +177,7 @@ class EightPuzzle:
     def init_table(seed=None):
         """
         This function create initial state of the 8-table.
-        he function return only solvable init table.
+        The function return only solvable init table.
         :param seed: seed to the random function, optional
         :return:
         """
