@@ -11,9 +11,9 @@ goal_state = np.array([[1, 2, 3],
                        [7, 8, 0]])
 
 
-def main():
+def solve_puzzle():
     """
-    The main function initialize a random (solvable) table and return a solution.
+    The main function initialize a random (solvable) table and print the solution.
     :return:
     """
 
@@ -154,10 +154,9 @@ def plot_comparison():
     results = results_dataframe(a_star, bnb)
 
 
-
-
 if __name__ == '__main__':
-    # main()
+
+    # solve_puzzle()
 
     # compare_algorithms()
 
