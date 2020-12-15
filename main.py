@@ -24,7 +24,7 @@ def solve_puzzle():
     # Solve the init table
     puzzle = EightPuzzle(init_state, goal_state)
 
-    solution = puzzle.solve('A*', h_misplaced)
+    solution = puzzle.solve('A*', h_manhattan)
 
     # Print solution
     print('Solution Way:')
@@ -194,7 +194,7 @@ def plot_comparison():
 if __name__ == '__main__':
 
     # Solve a random single 8-puzzle and print the solution
-    # solve_puzzle()
+    solve_puzzle()
 
     # Compare algorithms solving the 8-puzzle
     # compare_algorithms()
