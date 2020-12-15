@@ -145,7 +145,8 @@ class EightPuzzle:
                 else:
                     if tuple(child.flatten()) not in close_set:
 
-                        open_list.append(Node(child, g_value + h_function(child, self.goal_state), parent))
+                        f_value = g_value + h_function(child, self.goal_state)
+                        open_list.append(Node(child, f_value, parent))
 
             # Best-First: sort the open list
             open_list.sort(key=lambda x: x.lb)
