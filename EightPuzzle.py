@@ -25,6 +25,11 @@ def print_status(iteration, open_list_length):
     sys.stdout.flush()
 
 
+def print_finished(iterations):
+
+    print('\n\nTotal iterations: {}\n'.format(iterations))
+
+
 class EightPuzzle:
 
     def __init__(self, init_state, goal_state):
@@ -93,11 +98,6 @@ class EightPuzzle:
             current_children = []
             parent_depth = parent.depth()
 
-            # Iteration status
-            iterations += 1
-            if iterations > 5000 == 0:
-                print('This is a taught one...', end='\r')
-
             # Branch
             for child in parent.expand():
 
@@ -124,6 +124,9 @@ class EightPuzzle:
 
             # Update close set
             close_set.add(tuple(parent.table.flatten()))
+
+        if verbose & (solution is not None):
+            print_finished(iterations)
 
         self.solution = solution
 
@@ -164,7 +167,12 @@ class EightPuzzle:
 
                 # If this children is the goal state - this is an optimal solution
                 if (child == self.goal_state).all():
+
                     self.solution = Node(child, g_value, parent)
+
+                    if verbose:
+                        print_finished(iterations)
+
                     return
 
                 # If not a solution
