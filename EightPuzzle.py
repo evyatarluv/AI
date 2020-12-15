@@ -1,8 +1,7 @@
-import copy
 import numpy as np
 from Node import Node
-import time
 import random as rnd
+import sys
 
 
 def reconstruct_solution(solution):
@@ -16,6 +15,14 @@ def reconstruct_solution(solution):
         node = node.parent
 
     return solution_list
+
+
+def print_status(iteration, open_list_length):
+
+    sys.stdout.write('\r')
+    # the exact output you're looking for:
+    sys.stdout.write('Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length))
+    sys.stdout.flush()
 
 
 class EightPuzzle:
@@ -52,10 +59,11 @@ class EightPuzzle:
 
         return reconstruct_solution(self.solution)
 
-    def bnb_solve(self, h_function):
+    def bnb_solve(self, h_function, verbose=True):
         """
         This method implement Branch & Bound algorithm.
         The B&B implementation using priority queue for the open list.
+        :param verbose: bool, if to print log messages
         :param h_function: heuristic function for the LB
         :return: solution (Node)
         """
@@ -67,7 +75,18 @@ class EightPuzzle:
         ub = np.inf
         iterations = 0
 
+        # Verbose
+        if verbose:
+            print('Got my init state: \n {}'.format(self.init_state))
+            print('Start working to find solution using B&B...')
+
         while len(open_list) > 0:
+
+            # Verbose the status
+            if verbose:
+                iterations += 1
+                if iterations % 300 == 0:
+                    print_status(iterations, len(open_list))
 
             # Get the current parent node for this iteration
             parent = open_list.pop(0)
@@ -108,10 +127,11 @@ class EightPuzzle:
 
         self.solution = solution
 
-    def a_star_solve(self, h_function):
+    def a_star_solve(self, h_function, verbose=True):
 
         """
         This method implement A* algorithm.
+        :param verbose: bool, if to print log messages
         :param h_function: heuristic function for f function.
         :return: solution (Node)
         """
@@ -122,16 +142,22 @@ class EightPuzzle:
         close_set = set()
         iterations = 0
 
+        # Verbose
+        if verbose:
+            print('Got my init state: \n{}'.format(self.init_state))
+            print('Start working to find solution using A*...\n')
+
         while len(open_list) > 0:
+
+            # Verbose the status
+            if verbose:
+                iterations += 1
+                if iterations % 300 == 0:
+                    print_status(iterations, len(open_list))
 
             # Get the current parent node for this iteration
             parent = open_list.pop(0)
             g_value = parent.depth() + 1
-
-            # Iteration status
-            # iterations += 1
-            # if iterations % 100 == 0:
-            #     print('\rIterations: {}, Open List: {}'.format(iterations, len(open_list)))
 
             # Expand node
             for child in parent.expand():
