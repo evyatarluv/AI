@@ -19,7 +19,7 @@ def solve_puzzle():
     """
 
     # Init table
-    init_state = EightPuzzle.init_table(seed=51)
+    init_state = EightPuzzle.init_table()
 
     # Solve the init table
     puzzle = EightPuzzle(init_state, goal_state)
@@ -200,4 +200,4 @@ if __name__ == '__main__':
     # compare_algorithms()
 
     # Plot comparison figures
-    plot_comparison()
+    # plot_comparison()
