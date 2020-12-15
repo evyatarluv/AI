@@ -1,21 +1,7 @@
-import copy
 import numpy as np
 from Node import Node
-import time
 import random as rnd
-
-
-def reconstruct_solution(solution):
-
-    solution_list = [solution]
-    node = solution.parent
-
-    while node is not None:
-
-        solution_list.insert(0, node)
-        node = node.parent
-
-    return solution_list
+import sys
 
 
 class EightPuzzle:
@@ -50,12 +36,13 @@ class EightPuzzle:
         else:
             raise NameError('Unused algorithm, please choose `BnB` or `A*`.')
 
-        return reconstruct_solution(self.solution)
+        return self.reconstruct_solution(self.solution)
 
-    def bnb_solve(self, h_function):
+    def bnb_solve(self, h_function, verbose=True):
         """
         This method implement Branch & Bound algorithm.
         The B&B implementation using priority queue for the open list.
+        :param verbose: bool, if to print log messages
         :param h_function: heuristic function for the LB
         :return: solution (Node)
         """
@@ -67,17 +54,23 @@ class EightPuzzle:
         ub = np.inf
         iterations = 0
 
+        # Verbose
+        if verbose:
+            print('Got my init state: \n {}'.format(self.init_state))
+            print('Start working to find solution using B&B...')
+
         while len(open_list) > 0:
+
+            # Verbose the status
+            if verbose:
+                iterations += 1
+                if iterations % 300 == 0:
+                    print_status(iterations, len(open_list))
 
             # Get the current parent node for this iteration
             parent = open_list.pop(0)
             current_children = []
             parent_depth = parent.depth()
-
-            # Iteration status
-            iterations += 1
-            if iterations > 5000 == 0:
-                print('This is a taught one...', end='\r')
 
             # Branch
             for child in parent.expand():
@@ -106,12 +99,16 @@ class EightPuzzle:
             # Update close set
             close_set.add(tuple(parent.table.flatten()))
 
+        if verbose & (solution is not None):
+            print_finished(iterations)
+
         self.solution = solution
 
-    def a_star_solve(self, h_function):
+    def a_star_solve(self, h_function, verbose=True):
 
         """
         This method implement A* algorithm.
+        :param verbose: bool, if to print log messages
         :param h_function: heuristic function for f function.
         :return: solution (Node)
         """
@@ -122,30 +119,42 @@ class EightPuzzle:
         close_set = set()
         iterations = 0
 
+        # Verbose
+        if verbose:
+            print('Got my init state: \n{}'.format(self.init_state))
+            print('Start working to find solution using A*...\n')
+
         while len(open_list) > 0:
+
+            # Verbose the status
+            if verbose:
+                iterations += 1
+                if iterations % 300 == 0:
+                    print_status(iterations, len(open_list))
 
             # Get the current parent node for this iteration
             parent = open_list.pop(0)
             g_value = parent.depth() + 1
-
-            # Iteration status
-            # iterations += 1
-            # if iterations % 100 == 0:
-            #     print('\rIterations: {}, Open List: {}'.format(iterations, len(open_list)))
 
             # Expand node
             for child in parent.expand():
 
                 # If this children is the goal state - this is an optimal solution
                 if (child == self.goal_state).all():
+
                     self.solution = Node(child, g_value, parent)
+
+                    if verbose:
+                        print_finished(iterations)
+
                     return
 
                 # If not a solution
                 else:
                     if tuple(child.flatten()) not in close_set:
 
-                        open_list.append(Node(child, g_value + h_function(child, self.goal_state), parent))
+                        f_value = g_value + h_function(child, self.goal_state)
+                        open_list.append(Node(child, f_value, parent))
 
             # Best-First: sort the open list
             open_list.sort(key=lambda x: x.lb)
@@ -191,3 +200,28 @@ class EightPuzzle:
             table = np.array(rnd.sample(range(9), 9)).reshape((3, 3))
 
         return table
+
+    @staticmethod
+    def reconstruct_solution(solution):
+
+        solution_list = [solution]
+        node = solution.parent
+
+        while node is not None:
+            solution_list.insert(0, node)
+            node = node.parent
+
+        return solution_list
+
+
+def print_status(iteration, open_list_length):
+
+    sys.stdout.write('\r')
+    # the exact output you're looking for:
+    sys.stdout.write('Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length))
+    sys.stdout.flush()
+
+
+def print_finished(iterations):
+
+    print('\n\nTotal iterations: {}\n'.format(iterations))

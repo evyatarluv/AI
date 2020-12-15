@@ -2,7 +2,7 @@
 
 Script for all the heuristics functions
 Each function need to get the current table and the goal table.
-The heuristic return the h value.
+The heuristic return the h value as int or float.
 
 """
 
