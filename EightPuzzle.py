@@ -136,25 +136,23 @@ class EightPuzzle:
             parent = open_list.pop(0)
             g_value = parent.depth() + 1
 
+            # If this node is the solution - stop
+            if (parent.table == self.goal_state).all():
+
+                self.solution = Node(child, g_value, parent)
+
+                if verbose:
+                    print_finished(iterations)
+
+                return
+
             # Expand node
             for child in parent.expand():
 
-                # If this children is the goal state - this is an optimal solution
-                if (child == self.goal_state).all():
+                if tuple(child.flatten()) not in close_set:
 
-                    self.solution = Node(child, g_value, parent)
-
-                    if verbose:
-                        print_finished(iterations)
-
-                    return
-
-                # If not a solution
-                else:
-                    if tuple(child.flatten()) not in close_set:
-
-                        f_value = g_value + h_function(child, self.goal_state)
-                        open_list.append(Node(child, f_value, parent))
+                    f_value = g_value + h_function(child, self.goal_state)
+                    open_list.append(Node(child, f_value, parent))
 
             # Best-First: sort the open list
             open_list.sort(key=lambda x: x.lb)
