@@ -4,32 +4,6 @@ import random as rnd
 import sys
 
 
-def reconstruct_solution(solution):
-
-    solution_list = [solution]
-    node = solution.parent
-
-    while node is not None:
-
-        solution_list.insert(0, node)
-        node = node.parent
-
-    return solution_list
-
-
-def print_status(iteration, open_list_length):
-
-    sys.stdout.write('\r')
-    # the exact output you're looking for:
-    sys.stdout.write('Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length))
-    sys.stdout.flush()
-
-
-def print_finished(iterations):
-
-    print('\n\nTotal iterations: {}\n'.format(iterations))
-
-
 class EightPuzzle:
 
     def __init__(self, init_state, goal_state):
@@ -62,7 +36,7 @@ class EightPuzzle:
         else:
             raise NameError('Unused algorithm, please choose `BnB` or `A*`.')
 
-        return reconstruct_solution(self.solution)
+        return self.reconstruct_solution(self.solution)
 
     def bnb_solve(self, h_function, verbose=True):
         """
@@ -226,3 +200,28 @@ class EightPuzzle:
             table = np.array(rnd.sample(range(9), 9)).reshape((3, 3))
 
         return table
+
+    @staticmethod
+    def reconstruct_solution(solution):
+
+        solution_list = [solution]
+        node = solution.parent
+
+        while node is not None:
+            solution_list.insert(0, node)
+            node = node.parent
+
+        return solution_list
+
+
+def print_status(iteration, open_list_length):
+
+    sys.stdout.write('\r')
+    # the exact output you're looking for:
+    sys.stdout.write('Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length))
+    sys.stdout.flush()
+
+
+def print_finished(iterations):
+
+    print('\n\nTotal iterations: {}\n'.format(iterations))
