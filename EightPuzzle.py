@@ -58,7 +58,8 @@ class EightPuzzle:
 
         # Verbose
         if verbose:
-            print('Running B&B with {} approach...\nGot my init state: \n{}'.format(search_type.upper(), self.init_state))
+            print('Running B&B while searching {} approach...\nGot my init state: \n{}'.format(search_type.upper(),
+                                                                                               self.init_state))
 
         # Start searching for solution
         while len(open_states) > 0:
@@ -157,7 +158,6 @@ class EightPuzzle:
             for child in parent.expand():
 
                 if tuple(child.flatten()) not in close_set:
-
                     f_value = g_value + h_function(child, self.goal_state)
                     open_list.append(Node(child, f_value, parent))
 
@@ -220,7 +220,6 @@ class EightPuzzle:
 
 
 def print_status(iteration, open_list_length, ub=None):
-
     # Build the status log
     if ub is not None:
         status = 'Status: Iteration = {}, Open List Length = {}, UB = {}'.format(iteration, open_list_length, ub)
@@ -235,12 +234,10 @@ def print_status(iteration, open_list_length, ub=None):
 
 
 def print_finished(iterations):
-
     print('\n\nTotal iterations: {}\n'.format(iterations))
 
 
 def get_all_parents(node):
-
     """
     Get a set with all the parents of this parent node (including himself)
     :param node: first parent.
@@ -250,7 +247,6 @@ def get_all_parents(node):
     parents = set()
 
     while node is not None:
-
         parents.add(tuple(node.table.flatten()))
         node = node.parent
 
