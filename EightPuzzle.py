@@ -14,23 +14,21 @@ class EightPuzzle:
 
         self.solution = None
 
-    def solve(self, algorithm, h_function):
+    def solve(self, algorithm, h_function, search_type=None):
         """
         This method get an algorithm name to solve the eight-puzzle, and heuristic function.
         The method return a solution.
+        :param search_type: str, search type if using B&B. currently need to be DFS/BFS
         :param algorithm: str, algorithm name
         :param h_function: function which get current table (matrix) and goal state (matrix)
                             and return scalar
         :return: solution as Node object or None if there is no solution
         """
 
-        # print('Using {} to solve the 8-puzzle...'.format(algorithm))
-        # print('Init table: \n{}'.format(self.init_state))
-
         if algorithm.lower() in ['bnb', 'b&b']:
-            self.bnb_solve(h_function)
+            self.bnb_solve(h_function, search_type)
 
-        elif algorithm.lower() in ['a*', 'a_star']:
+        elif algorithm.lower() in ['a*', 'a_star', 'a star']:
             self.a_star_solve(h_function)
 
         else:
@@ -38,30 +36,80 @@ class EightPuzzle:
 
         return self.reconstruct_solution(self.solution)
 
-    def bnb_solve(self, h_function, verbose=True):
+    def bnb_solve(self, h_function, search_type, verbose=True):
         """
         This method implement Branch & Bound algorithm.
-        The B&B implementation using priority queue for the open list.
+        The implementation define according to the search_type argument with to search depth first or breadth first.
+        :param search_type: str, how to search - DFS or BFS?
         :param verbose: bool, if to print log messages
         :param h_function: heuristic function for the LB
         :return: solution (Node)
         """
 
-        while True:
+        # Ensure the search type
+        if search_type.lower() not in ['bfs', 'dfs']:
+            raise NotImplementedError('The search type is not implemented yet.')
 
-            user_input = input('How you want me to search? DFS (d) or BFS (b)?\n').lower()
+        # Init params
+        solution = None
+        open_states = [self.init_state]
+        ub = np.inf
+        iterations = 0
 
-            if user_input == 'd':
+        # Verbose
+        if verbose:
+            print('Running B&B with {} approach...\nGot my init state: \n{}'.format(search_type.upper(), self.init_state))
 
-                self.dfs(h_function, verbose)
-                return
+        # Start searching for solution
+        while len(open_states) > 0:
 
-            elif user_input == 'b':
+            # Verbose the status
+            if verbose:
+                iterations += 1
+                if iterations % 300 == 0:
+                    print_status(iterations, len(open_states), ub)
 
-                self.bfs(h_function, verbose)
-                return
+            # Get the current parent node for this iteration
+            parent = open_states.pop(0)
+            current_children = []
+            parent_depth = parent.depth()
 
-            print('Please choose `d` or `b` only.')
+            # Get all the parent's parents to avoid loops
+            all_parents = get_all_parents(parent)
+
+            # Branch
+            for child in parent.expand():
+
+                # If this children is the goal state
+                if (child == self.goal_state).all():
+
+                    # If this solution is better then the current solution - update UB
+                    if parent_depth + 1 < ub:
+                        ub = parent_depth + 1
+                        solution = Node(child, ub, parent)
+
+                # Bound
+                else:
+                    if tuple(child.flatten()) not in all_parents:
+
+                        lb = parent_depth + 1 + h_function(child, self.goal_state)
+
+                        if lb < ub:
+                            current_children.append(Node(child, lb, parent))
+
+            # Update open list according to the search type
+            current_children.sort(key=lambda x: x.lb)
+
+            if search_type.lower() == 'dfs':
+                open_states = current_children + open_states
+
+            elif search_type.lower() == 'bfs':
+                open_states += current_children
+
+        if verbose & (solution is not None):
+            print_finished(iterations)
+
+        self.solution = solution
 
     def a_star_solve(self, h_function, verbose=True):
 
@@ -120,73 +168,6 @@ class EightPuzzle:
             close_set.add(tuple(parent.table.flatten()))
 
         self.solution = solution
-
-    def dfs(self, h_function, verbose):
-
-        """
-        Implementation of B&B running Depth-First.
-        :param verbose: bool, if to print log messages
-        :param h_function: heuristic function to calculate the h value
-        :return: bool answer if a solution was founded
-        """
-
-        solution = None
-        open_states = [self.init_state]
-        ub = np.inf
-        iterations = 0
-
-        # Verbose
-        if verbose:
-            print('Running DFS...\nGot my init state: \n{}'.format(self.init_state))
-            print('Start working to find solution using DFS B&B...')
-
-        while len(open_states) > 0:
-
-            # Verbose the status
-            if verbose:
-                iterations += 1
-                if iterations % 300 == 0:
-                    print_status(iterations, len(open_states), ub)
-
-            # Get the current parent node for this iteration
-            parent = open_states.pop(0)
-            current_children = []
-            parent_depth = parent.depth()
-
-            # Get all the parent's parents to avoid loops
-            all_parents = get_all_parents(parent)
-
-            # Branch
-            for child in parent.expand():
-
-                # If this children is the goal state
-                if (child == self.goal_state).all():
-
-                    # If this solution is better then the current solution - update UB
-                    if parent_depth + 1 < ub:
-                        ub = parent_depth + 1
-                        solution = Node(child, ub, parent)
-
-                # Bound
-                else:
-                    if tuple(child.flatten()) not in all_parents:
-
-                        lb = parent_depth + 1 + h_function(child, self.goal_state)
-
-                        if lb < ub:
-                            current_children.append(Node(child, lb, parent))
-
-            # Update open list
-            current_children.sort(key=lambda x: x.lb)
-            open_states = current_children + open_states
-
-        if verbose & (solution is not None):
-            print_finished(iterations)
-
-        self.solution = solution
-
-    def bfs(self, h_function):
-        pass
 
     @staticmethod
     def is_solvable(table):

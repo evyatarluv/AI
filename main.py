@@ -13,17 +13,20 @@ goal_state = np.array([[1, 2, 3],
 
 
 def solve_puzzle():
+
     """
-    The main function initialize a random (solvable) table and print the solution.
+    This function is an interactive 8-puzzle solver.
+    The user can define a init table, or rand one.
+    Then the user choose an algorithm which solve the puzzle.
+    The solver return the solution and the function print it.
     :return:
     """
 
-    # Init table
+    # Init solvable table
     init_state = EightPuzzle.init_table()
 
     # Solve the init table
     puzzle = EightPuzzle(init_state, goal_state)
-
     solution = puzzle.solve('bnb', h_manhattan)
 
     # Print solution
@@ -201,3 +204,19 @@ if __name__ == '__main__':
 
     # Plot comparison figures
     # plot_comparison()
+
+'''while True:
+
+    user_input = input('How you want me to search? DFS (d) or BFS (b)?\n').lower()
+
+    if user_input == 'd':
+
+        self.dfs(h_function, verbose)
+        return
+
+    elif user_input == 'b':
+
+        self.bfs(h_function, verbose)
+        return
+
+    print('Please choose `d` or `b` only.')'''
