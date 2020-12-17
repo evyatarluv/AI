@@ -27,14 +27,14 @@ class EightPuzzle:
         # print('Using {} to solve the 8-puzzle...'.format(algorithm))
         # print('Init table: \n{}'.format(self.init_state))
 
-        if algorithm == 'BnB':
+        if algorithm.lower() in ['bnb', 'b&b']:
             self.bnb_solve(h_function)
 
-        elif algorithm == 'A*':
+        elif algorithm.lower() in ['a*', 'a_star']:
             self.a_star_solve(h_function)
 
         else:
-            raise NameError('Unused algorithm, please choose `BnB` or `A*`.')
+            raise NotImplementedError('Un-implemented algorithm, please choose different algorithm')
 
         return self.reconstruct_solution(self.solution)
 
@@ -47,62 +47,21 @@ class EightPuzzle:
         :return: solution (Node)
         """
 
-        # Init params
-        solution = None
-        open_list = [self.init_state]
-        close_set = set()
-        ub = np.inf
-        iterations = 0
+        while True:
 
-        # Verbose
-        if verbose:
-            print('Got my init state: \n {}'.format(self.init_state))
-            print('Start working to find solution using B&B...')
+            user_input = input('How you want me to search? DFS (d) or BFS (b)?\n').lower()
 
-        while len(open_list) > 0:
+            if user_input == 'd':
 
-            # Verbose the status
-            if verbose:
-                iterations += 1
-                if iterations % 300 == 0:
-                    print_status(iterations, len(open_list))
+                self.dfs(h_function, verbose)
+                return
 
-            # Get the current parent node for this iteration
-            parent = open_list.pop(0)
-            current_children = []
-            parent_depth = parent.depth()
+            elif user_input == 'b':
 
-            # Branch
-            for child in parent.expand():
+                self.bfs(h_function, verbose)
+                return
 
-                # If this children is the goal state
-                if (child == self.goal_state).all():
-
-                    # If this solution is better then the current solution
-                    if parent_depth + 1 < ub:
-                        ub = parent_depth + 1
-                        solution = Node(child, ub, parent)
-
-                # Bound
-                else:
-                    if tuple(child.flatten()) not in close_set:
-
-                        lb = parent_depth + 1 + h_function(child, self.goal_state)
-
-                        if lb < ub:
-                            current_children.append(Node(child, lb, parent))
-
-            # Update open list
-            open_list = current_children + open_list
-            open_list.sort(key=lambda x: x.lb)
-
-            # Update close set
-            close_set.add(tuple(parent.table.flatten()))
-
-        if verbose & (solution is not None):
-            print_finished(iterations)
-
-        self.solution = solution
+            print('Please choose `d` or `b` only.')
 
     def a_star_solve(self, h_function, verbose=True):
 
@@ -162,6 +121,73 @@ class EightPuzzle:
 
         self.solution = solution
 
+    def dfs(self, h_function, verbose):
+
+        """
+        Implementation of B&B running Depth-First.
+        :param verbose: bool, if to print log messages
+        :param h_function: heuristic function to calculate the h value
+        :return: bool answer if a solution was founded
+        """
+
+        solution = None
+        open_states = [self.init_state]
+        ub = np.inf
+        iterations = 0
+
+        # Verbose
+        if verbose:
+            print('Running DFS...\nGot my init state: \n{}'.format(self.init_state))
+            print('Start working to find solution using DFS B&B...')
+
+        while len(open_states) > 0:
+
+            # Verbose the status
+            if verbose:
+                iterations += 1
+                if iterations % 300 == 0:
+                    print_status(iterations, len(open_states), ub)
+
+            # Get the current parent node for this iteration
+            parent = open_states.pop(0)
+            current_children = []
+            parent_depth = parent.depth()
+
+            # Get all the parent's parents to avoid loops
+            all_parents = get_all_parents(parent)
+
+            # Branch
+            for child in parent.expand():
+
+                # If this children is the goal state
+                if (child == self.goal_state).all():
+
+                    # If this solution is better then the current solution - update UB
+                    if parent_depth + 1 < ub:
+                        ub = parent_depth + 1
+                        solution = Node(child, ub, parent)
+
+                # Bound
+                else:
+                    if tuple(child.flatten()) not in all_parents:
+
+                        lb = parent_depth + 1 + h_function(child, self.goal_state)
+
+                        if lb < ub:
+                            current_children.append(Node(child, lb, parent))
+
+            # Update open list
+            current_children.sort(key=lambda x: x.lb)
+            open_states = current_children + open_states
+
+        if verbose & (solution is not None):
+            print_finished(iterations)
+
+        self.solution = solution
+
+    def bfs(self, h_function):
+        pass
+
     @staticmethod
     def is_solvable(table):
         """
@@ -212,14 +238,39 @@ class EightPuzzle:
         return solution_list
 
 
-def print_status(iteration, open_list_length):
+def print_status(iteration, open_list_length, ub=None):
 
+    # Build the status log
+    if ub is not None:
+        status = 'Status: Iteration = {}, Open List Length = {}, UB = {}'.format(iteration, open_list_length, ub)
+
+    else:
+        status = 'Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length)
+
+    # Print it
     sys.stdout.write('\r')
-    # the exact output you're looking for:
-    sys.stdout.write('Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length))
+    sys.stdout.write(status)
     sys.stdout.flush()
 
 
 def print_finished(iterations):
 
     print('\n\nTotal iterations: {}\n'.format(iterations))
+
+
+def get_all_parents(node):
+
+    """
+    Get a set with all the parents of this parent node (including himself)
+    :param node: first parent.
+    :return: set with all the parents while each parent is tuple
+    """
+
+    parents = set()
+
+    while node is not None:
+
+        parents.add(tuple(node.table.flatten()))
+        node = node.parent
+
+    return parents

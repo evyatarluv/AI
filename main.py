@@ -24,7 +24,7 @@ def solve_puzzle():
     # Solve the init table
     puzzle = EightPuzzle(init_state, goal_state)
 
-    solution = puzzle.solve('A*', h_manhattan)
+    solution = puzzle.solve('bnb', h_manhattan)
 
     # Print solution
     print('Solution Way:')
