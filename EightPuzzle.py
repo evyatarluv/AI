@@ -68,7 +68,7 @@ class EightPuzzle:
             if verbose:
                 iterations += 1
                 if iterations % 300 == 0:
-                    print_status(iterations, len(open_states), ub)
+                    print_status(iterations, len(open_states), ub, parent_depth)
 
             # Get the current parent node for this iteration
             parent = open_states.pop(0)
@@ -219,10 +219,11 @@ class EightPuzzle:
         return solution_list
 
 
-def print_status(iteration, open_list_length, ub=None):
+def print_status(iteration, open_list_length, ub=None, depth=None):
     # Build the status log
     if ub is not None:
-        status = 'Status: Iteration = {}, Open List Length = {}, UB = {}'.format(iteration, open_list_length, ub)
+        status = 'Status: Iteration = {}, Open List Length = {}, UB = {}, depth: {}'.format(iteration, open_list_length,
+                                                                                            ub, depth)
 
     else:
         status = 'Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length)

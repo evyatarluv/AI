@@ -75,7 +75,7 @@ def solve_puzzle():
     # Init solvable table
     init_state = EightPuzzle.init_table()
 
-    # Get the user algorithm
+    # Get the user solver preferences
     algorithm, search_type, h_function = user_choose_solver()
 
     # Solve the init table
@@ -257,3 +257,8 @@ if __name__ == '__main__':
 
     # Plot comparison figures
     # plot_comparison()
+
+# My play zone
+# init = np.array([1,4,7,6,2,0,5,3,8]).reshape((3,3))
+# p = EightPuzzle(init, goal_state)
+# print('Solution Length: {}'.format(len(p.solve('bnb', h_manhattan, 'dfs')) - 1))
