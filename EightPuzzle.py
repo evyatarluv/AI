@@ -14,63 +14,69 @@ class EightPuzzle:
 
         self.solution = None
 
-    def solve(self, algorithm, h_function):
+    def solve(self, algorithm, h_function, search_type=None):
         """
         This method get an algorithm name to solve the eight-puzzle, and heuristic function.
         The method return a solution.
+        :param search_type: str, search type if using B&B. currently need to be DFS/BFS
         :param algorithm: str, algorithm name
         :param h_function: function which get current table (matrix) and goal state (matrix)
                             and return scalar
         :return: solution as Node object or None if there is no solution
         """
 
-        # print('Using {} to solve the 8-puzzle...'.format(algorithm))
-        # print('Init table: \n{}'.format(self.init_state))
+        if algorithm.lower() in ['bnb', 'b&b']:
+            self.bnb_solve(h_function, search_type)
 
-        if algorithm == 'BnB':
-            self.bnb_solve(h_function)
-
-        elif algorithm == 'A*':
+        elif algorithm.lower() in ['a*', 'a_star', 'a star']:
             self.a_star_solve(h_function)
 
         else:
-            raise NameError('Unused algorithm, please choose `BnB` or `A*`.')
+            raise NotImplementedError('Un-implemented algorithm, please choose different algorithm')
 
         return self.reconstruct_solution(self.solution)
 
-    def bnb_solve(self, h_function, verbose=True):
+    def bnb_solve(self, h_function, search_type, verbose=True):
         """
         This method implement Branch & Bound algorithm.
-        The B&B implementation using priority queue for the open list.
+        The implementation define according to the search_type argument with to search depth first or breadth first.
+        :param search_type: str, how to search - DFS or BFS?
         :param verbose: bool, if to print log messages
         :param h_function: heuristic function for the LB
         :return: solution (Node)
         """
 
+        # Ensure the search type
+        if search_type.lower() not in ['bfs', 'dfs']:
+            raise NotImplementedError('The search type is not implemented yet.')
+
         # Init params
         solution = None
-        open_list = [self.init_state]
-        close_set = set()
+        open_states = [self.init_state]
         ub = np.inf
         iterations = 0
 
         # Verbose
         if verbose:
-            print('Got my init state: \n {}'.format(self.init_state))
-            print('Start working to find solution using B&B...')
+            print('Running B&B while searching {} approach...\nGot my init state: \n{}'.format(search_type.upper(),
+                                                                                               self.init_state))
 
-        while len(open_list) > 0:
+        # Start searching for solution
+        while len(open_states) > 0:
 
             # Verbose the status
             if verbose:
                 iterations += 1
                 if iterations % 300 == 0:
-                    print_status(iterations, len(open_list))
+                    print_status(iterations, len(open_states), ub, parent_depth)
 
             # Get the current parent node for this iteration
-            parent = open_list.pop(0)
+            parent = open_states.pop(0)
             current_children = []
             parent_depth = parent.depth()
+
+            # Get all the parent's parents to avoid loops
+            all_parents = get_all_parents(parent)
 
             # Branch
             for child in parent.expand():
@@ -78,26 +84,28 @@ class EightPuzzle:
                 # If this children is the goal state
                 if (child == self.goal_state).all():
 
-                    # If this solution is better then the current solution
+                    # If this solution is better then the current solution - update UB
                     if parent_depth + 1 < ub:
                         ub = parent_depth + 1
                         solution = Node(child, ub, parent)
 
                 # Bound
                 else:
-                    if tuple(child.flatten()) not in close_set:
+                    if tuple(child.flatten()) not in all_parents:
 
                         lb = parent_depth + 1 + h_function(child, self.goal_state)
 
                         if lb < ub:
                             current_children.append(Node(child, lb, parent))
 
-            # Update open list
-            open_list = current_children + open_list
-            open_list.sort(key=lambda x: x.lb)
+            # Update open list according to the search type
+            current_children.sort(key=lambda x: x.lb)
 
-            # Update close set
-            close_set.add(tuple(parent.table.flatten()))
+            if search_type.lower() == 'dfs':
+                open_states = current_children + open_states
+
+            elif search_type.lower() == 'bfs':
+                open_states += current_children
 
         if verbose & (solution is not None):
             print_finished(iterations)
@@ -150,7 +158,6 @@ class EightPuzzle:
             for child in parent.expand():
 
                 if tuple(child.flatten()) not in close_set:
-
                     f_value = g_value + h_function(child, self.goal_state)
                     open_list.append(Node(child, f_value, parent))
 
@@ -212,14 +219,36 @@ class EightPuzzle:
         return solution_list
 
 
-def print_status(iteration, open_list_length):
+def print_status(iteration, open_list_length, ub=None, depth=None):
+    # Build the status log
+    if ub is not None:
+        status = 'Status: Iteration = {}, Open List Length = {}, UB = {}, depth: {}'.format(iteration, open_list_length,
+                                                                                            ub, depth)
 
+    else:
+        status = 'Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length)
+
+    # Print it
     sys.stdout.write('\r')
-    # the exact output you're looking for:
-    sys.stdout.write('Status: Iteration = {}, Open List Length = {}'.format(iteration, open_list_length))
+    sys.stdout.write(status)
     sys.stdout.flush()
 
 
 def print_finished(iterations):
-
     print('\n\nTotal iterations: {}\n'.format(iterations))
+
+
+def get_all_parents(node):
+    """
+    Get a set with all the parents of this parent node (including himself)
+    :param node: first parent.
+    :return: set with all the parents while each parent is tuple
+    """
+
+    parents = set()
+
+    while node is not None:
+        parents.add(tuple(node.table.flatten()))
+        node = node.parent
+
+    return parents

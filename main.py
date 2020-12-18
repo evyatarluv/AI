@@ -12,19 +12,75 @@ goal_state = np.array([[1, 2, 3],
                        [7, 8, 0]])
 
 
-def solve_puzzle():
+def user_choose_solver():
     """
-    The main function initialize a random (solvable) table and print the solution.
+    The function get from the user the the algorithm to work with.
+    If the user chose B&B we need to get also the search type.
+
+    :return: algorithm and search type as str
+    """
+
+    # Choose algorithm
+    algorithms = {'a': 'A*', 'b': 'bnb'}
+    while True:
+
+        try:
+            user_algo = input('Please choose your algorithm - A* (a) or B&B (b)\n')
+            algorithm = algorithms[user_algo]
+            break
+
+        except KeyError:
+            print('Please choose one of the requested letters')
+
+    # Choose search type
+    if algorithm == 'bnb':
+        types = {'d': 'dfs', 'b': 'bfs'}
+
+        while True:
+            try:
+                user_type = input('DFS (d) or BFS (b)?\n').lower()
+                search_type = types[user_type]
+                break
+            except KeyError:
+                print('Please choose one of the requested letters')
+    else:
+        search_type = None
+
+    # Choose h function
+    h_functions = {'ma': h_manhattan, 'e': h_euclidean, 'mi': h_misplaced}
+    while True:
+
+        try:
+            user_h = input('Please choose heuristic function - manhattan (ma), euclidean (e) or misplace (mi)\n').lower()
+            h_function = h_functions[user_h]
+            break
+
+        except KeyError:
+
+            print('Please choose one of the requested letters')
+
+    return algorithm, search_type, h_function
+
+
+def solve_puzzle():
+
+    """
+    This function is an interactive 8-puzzle solver.
+    The user can define a init table, or rand one.
+    Then the user choose an algorithm which solve the puzzle.
+    The solver return the solution and the function print it.
     :return:
     """
 
-    # Init table
+    # Init solvable table
     init_state = EightPuzzle.init_table()
+
+    # Get the user solver preferences
+    algorithm, search_type, h_function = user_choose_solver()
 
     # Solve the init table
     puzzle = EightPuzzle(init_state, goal_state)
-
-    solution = puzzle.solve('A*', h_manhattan)
+    solution = puzzle.solve(algorithm, h_function, search_type)
 
     # Print solution
     print('Solution Way:')
@@ -201,3 +257,8 @@ if __name__ == '__main__':
 
     # Plot comparison figures
     # plot_comparison()
+
+# My play zone
+# init = np.array([1,4,7,6,2,0,5,3,8]).reshape((3,3))
+# p = EightPuzzle(init, goal_state)
+# print('Solution Length: {}'.format(len(p.solve('bnb', h_manhattan, 'dfs')) - 1))
