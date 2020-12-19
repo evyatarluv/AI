@@ -261,20 +261,6 @@ if __name__ == '__main__':
     pass
 
 # My play zone
-# init = np.array([5,3,0,2,4,1,7,8,6]).reshape((3,3))
-# p = EightPuzzle(init, goal_state)
-# print('Solution Length: {}'.format(len(p.solve('bnb', h_manhattan, 'dfs')) - 1))
-sol_length = 31
-i = 0
-while sol_length > 19:
-
-    init_state = EightPuzzle.init_table()
-
-    # Solve the init table
-    puzzle = EightPuzzle(init_state, goal_state)
-    sol_length = len(puzzle.solve('A*', h_manhattan, verbose=False))
-
-    i += 1
-    print('i = {}, length = {}'.format(i, sol_length))
-
-print(init_state)
+init = np.array([5,3,0,2,4,1,7,8,6]).reshape((3,3))
+p = EightPuzzle(init, goal_state)
+print('Solution Length: {}'.format(len(p.solve('A*', h_manhattan)) - 1))
