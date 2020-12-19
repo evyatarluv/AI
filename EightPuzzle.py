@@ -14,10 +14,11 @@ class EightPuzzle:
 
         self.solution = None
 
-    def solve(self, algorithm, h_function, search_type=None):
+    def solve(self, algorithm, h_function, search_type=None, verbose=True):
         """
         This method get an algorithm name to solve the eight-puzzle, and heuristic function.
         The method return a solution.
+        :param verbose: bool, if to verbose while running
         :param search_type: str, search type if using B&B. currently need to be DFS/BFS
         :param algorithm: str, algorithm name
         :param h_function: function which get current table (matrix) and goal state (matrix)
@@ -26,10 +27,10 @@ class EightPuzzle:
         """
 
         if algorithm.lower() in ['bnb', 'b&b']:
-            self.bnb_solve(h_function, search_type)
+            self.bnb_solve(h_function, search_type, verbose)
 
         elif algorithm.lower() in ['a*', 'a_star', 'a star']:
-            self.a_star_solve(h_function)
+            self.a_star_solve(h_function, verbose)
 
         else:
             raise NotImplementedError('Un-implemented algorithm, please choose different algorithm')

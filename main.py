@@ -250,7 +250,7 @@ def plot_comparison():
 if __name__ == '__main__':
 
     # Solve a random single 8-puzzle and print the solution
-    solve_puzzle()
+    # solve_puzzle()
 
     # Compare algorithms solving the 8-puzzle
     # compare_algorithms()
@@ -258,7 +258,19 @@ if __name__ == '__main__':
     # Plot comparison figures
     # plot_comparison()
 
+    pass
+
 # My play zone
 # init = np.array([1,4,7,6,2,0,5,3,8]).reshape((3,3))
 # p = EightPuzzle(init, goal_state)
 # print('Solution Length: {}'.format(len(p.solve('bnb', h_manhattan, 'dfs')) - 1))
+sol_length = 31
+while sol_length > 19:
+
+    init_state = EightPuzzle.init_table()
+
+    # Solve the init table
+    puzzle = EightPuzzle(init_state, goal_state)
+    solution = puzzle.solve('A*', h_manhattan)
+
+print(init_state)
