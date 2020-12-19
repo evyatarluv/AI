@@ -99,7 +99,7 @@ def init_seeds(amount):
 
     while len(seeds) < amount:
 
-        s = np.random.randint(0, np.inf)
+        s = np.random.randint(0, 5000)
         rnd_table = EightPuzzle.init_table(seed=s)
 
         if EightPuzzle.is_solvable(rnd_table):
