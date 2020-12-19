@@ -56,7 +56,6 @@ class EightPuzzle:
         open_states = [self.init_state]
         ub = np.inf
         iterations = 0
-        depths = []
 
         # Verbose
         if verbose:
@@ -76,7 +75,6 @@ class EightPuzzle:
             parent = open_states.pop(0)
             current_children = []
             parent_depth = parent.depth()
-            depths.append(parent_depth + 1)
 
             # Get all the parent's parents to avoid loops
             all_parents = get_all_parents(parent)
@@ -114,7 +112,6 @@ class EightPuzzle:
             print_finished(iterations)
 
         self.solution = solution
-        print('Depths: {}'.format(depths))
 
     def a_star_solve(self, h_function, verbose=True):
 
@@ -151,7 +148,7 @@ class EightPuzzle:
             # If this node is the solution - stop
             if (parent.table == self.goal_state).all():
 
-                self.solution = Node(child, g_value, parent)
+                self.solution = parent
 
                 if verbose:
                     print_finished(iterations)
