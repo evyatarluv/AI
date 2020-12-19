@@ -263,4 +263,4 @@ if __name__ == '__main__':
 # My play zone
 init = np.array([5,3,0,2,4,1,7,8,6]).reshape((3,3))
 p = EightPuzzle(init, goal_state)
-print('Solution Length: {}'.format(len(p.solve('A*', h_manhattan)) - 1))
+print('Solution Length: {}'.format(len(p.solve('bnb', h_manhattan, search_type='dfs', verbose=True)) - 1))
