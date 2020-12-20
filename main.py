@@ -108,14 +108,15 @@ def init_seeds(amount):
     return seeds
 
 
-def compare_algorithms():
+def compare_algorithms(comparisons_amount):
     """
     The function compare between A* and B&B algorithms using two different heuristics.
     Both algorithms compare according to given amount of different init tables.
+    :param comparisons_amount: int, the amount of comparisons for the algorithms
     :return:
     """
 
-    seeds = init_seeds(amount=5)
+    seeds = init_seeds(amount=comparisons_amount)
 
     a_star = {'manhattan': [], 'euclidean': []}
     bnb = {'manhattan': [], 'euclidean': []}
@@ -142,13 +143,13 @@ def compare_algorithms():
         # B&B with manhattan
         print('B&B & Manhattan')
         start = time()
-        puzzle.bnb_solve(h_manhattan, 'dfs', False)
+        puzzle.bnb_solve(h_manhattan, 'dfs', False, init_ub=31)
         bnb['manhattan'].append(time() - start)
 
         # B&B with euclidean
         print('B&B & Euclidean')
         start = time()
-        puzzle.bnb_solve(h_euclidean, 'dfs', False)
+        puzzle.bnb_solve(h_euclidean, 'dfs', False, init_ub=31)
         bnb['euclidean'].append(time() - start)
 
     print('A*: {}'.format(a_star))
@@ -280,10 +281,10 @@ def plot_depths():
 
 if __name__ == '__main__':
     # Solve a random single 8-puzzle and print the solution
-    solve_puzzle()
+    # solve_puzzle()
 
     # Compare algorithms solving the 8-puzzle
-    # compare_algorithms()
+    compare_algorithms()
 
     # Plot comparison figures
     # plot_comparison()
