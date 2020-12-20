@@ -14,7 +14,7 @@ class EightPuzzle:
 
         self.solution = None
 
-    def solve(self, algorithm, h_function, search_type=None, verbose=True):
+    def solve(self, algorithm, h_function, search_type='dfs', verbose=True):
         """
         This method get an algorithm name to solve the eight-puzzle, and heuristic function.
         The method return a solution.
@@ -37,10 +37,11 @@ class EightPuzzle:
 
         return self.reconstruct_solution(self.solution)
 
-    def bnb_solve(self, h_function, search_type, verbose=True):
+    def bnb_solve(self, h_function, search_type, verbose=True, init_ub=np.inf):
         """
         This method implement Branch & Bound algorithm.
         The implementation define according to the search_type argument with to search depth first or breadth first.
+        :param init_ub: float, the initial UB, by default infinity.
         :param search_type: str, how to search - DFS or BFS?
         :param verbose: bool, if to print log messages
         :param h_function: heuristic function for the LB
@@ -54,7 +55,7 @@ class EightPuzzle:
         # Init params
         solution = None
         open_states = [self.init_state]
-        ub = np.inf
+        ub = init_ub
         iterations = 0
 
         # Verbose
