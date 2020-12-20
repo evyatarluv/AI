@@ -95,17 +95,15 @@ def init_seeds(amount):
     :return: list with all the seeds
     """
 
-    i = 103
     seeds = []
 
     while len(seeds) < amount:
 
-        rnd_table = EightPuzzle.init_table(seed=i)
+        s = np.random.randint(0, 5000)
+        rnd_table = EightPuzzle.init_table(seed=s)
 
         if EightPuzzle.is_solvable(rnd_table):
-            seeds.append(i)
-
-        i += 1
+            seeds.append(s)
 
     return seeds
 
@@ -117,7 +115,7 @@ def compare_algorithms():
     :return:
     """
 
-    seeds = init_seeds(amount=50)
+    seeds = init_seeds(amount=20)
 
     a_star = {'manhattan': [], 'euclidean': []}
     bnb = {'manhattan': [], 'euclidean': []}
@@ -132,25 +130,25 @@ def compare_algorithms():
         # A* with manhattan
         print('A* & Manhattan')
         start = time()
-        puzzle.solve('A*', h_manhattan)
+        puzzle.a_star_solve(h_manhattan, False)
         a_star['manhattan'].append(time() - start)
 
         # A* with euclidean
         print('A* & Euclidean')
         start = time()
-        puzzle.solve('A*', h_euclidean)
+        puzzle.a_star_solve(h_euclidean, False)
         a_star['euclidean'].append(time() - start)
 
         # B&B with manhattan
         print('B&B & Manhattan')
         start = time()
-        puzzle.solve('BnB', h_manhattan)
+        puzzle.bnb_solve(h_manhattan, 'dfs', False)
         bnb['manhattan'].append(time() - start)
 
         # B&B with euclidean
         print('B&B & Euclidean')
         start = time()
-        puzzle.solve('BnB', h_euclidean)
+        puzzle.bnb_solve(h_euclidean, 'dfs', False)
         bnb['euclidean'].append(time() - start)
 
     print('A*: {}'.format(a_star))
@@ -247,18 +245,52 @@ def plot_comparison():
     plot_algorithms()
 
 
+def plot_depths():
+
+    bfs = np.loadtxt("figures_data/depths_bfs.txt", comments="#", delimiter=",", unpack=False)
+    dfs = np.loadtxt("figures_data/depths_dfs.txt", comments="#", delimiter=",", unpack=False)
+    a_star = np.loadtxt("figures_data/depths_astar.txt", comments="#", delimiter=",", unpack=False)
+
+    fig, axs = plt.subplots(3)
+
+    # Plot
+    axs[0].plot(a_star)
+    axs[1].plot(dfs)
+    axs[2].plot(bfs, label='Current Depth')
+
+    # Add titles
+    axs[0].set_title('A* - Best-First')
+    axs[1].set_title('Depth-First (DFS)')
+    axs[2].set_title('Breadth-First (BFS)')
+
+    # Add axis-labels
+    axs[2].set_xlabel('Iterations')
+    axs[1].set_ylabel('Depth')
+
+    for ax in axs:
+        ax.set_xticks([])
+        ax.axhline(17, color='red', linestyle='--', label='Solution Depth')
+
+    axs[2].legend(loc='lower right', bbox_to_anchor=(1, 0))
+
+    plt.show()
+
+
 if __name__ == '__main__':
 
     # Solve a random single 8-puzzle and print the solution
-    solve_puzzle()
+    # solve_puzzle()
 
     # Compare algorithms solving the 8-puzzle
-    # compare_algorithms()
+    compare_algorithms()
 
     # Plot comparison figures
     # plot_comparison()
 
 # My play zone
-# init = np.array([1,4,7,6,2,0,5,3,8]).reshape((3,3))
+# init = np.array([5,3,0,2,4,1,7,8,6]).reshape((3,3))
 # p = EightPuzzle(init, goal_state)
-# print('Solution Length: {}'.format(len(p.solve('bnb', h_manhattan, 'dfs')) - 1))
+# solution = p.solve('A*', h_manhattan, verbose=True)
+# print('Solution Length: {}'.format(len(solution) - 1))
+
+# plot_depths()
