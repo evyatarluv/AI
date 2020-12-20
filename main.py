@@ -51,7 +51,8 @@ def user_choose_solver():
     while True:
 
         try:
-            user_h = input('Please choose heuristic function - manhattan (ma), euclidean (e) or misplace (mi)\n').lower()
+            user_h = input(
+                'Please choose heuristic function - manhattan (ma), euclidean (e) or misplace (mi)\n').lower()
             h_function = h_functions[user_h]
             break
 
@@ -63,7 +64,6 @@ def user_choose_solver():
 
 
 def solve_puzzle():
-
     """
     This function is an interactive 8-puzzle solver.
     The user can define a init table, or rand one.
@@ -115,7 +115,7 @@ def compare_algorithms():
     :return:
     """
 
-    seeds = init_seeds(amount=20)
+    seeds = init_seeds(amount=5)
 
     a_star = {'manhattan': [], 'euclidean': []}
     bnb = {'manhattan': [], 'euclidean': []}
@@ -182,7 +182,6 @@ def results_dataframe(a_star, bnb):
 
 
 def plot_heuristics():
-
     a_star = {'Manhattan': [0.09871149063110352, 0.13067626953125, 0.7476649284362793,
                             0.024929285049438477, 0.4218897819519043, 0.09474515914916992, 0.33011531829833984,
                             0.06250691413879395, 0.04688739776611328, 0.4061143398284912,
@@ -205,6 +204,12 @@ def plot_heuristics():
                          0.9841430187225342, 0.17185616493225098, 0.23843598365783691,
                          0.2849304676055908, 0.010022401809692383, 1.2800819873809814, 0.9550232887268066]}
 
+    a_star = {'Manhattan': np.loadtxt("figures_data/run_times/astar_manhattan.txt", delimiter=",", unpack=False),
+              'Euclidean': np.loadtxt("figures_data/run_times/astar_euclidean.txt", delimiter=",", unpack=False)}
+
+    bnb = {'Manhattan': np.loadtxt("figures_data/run_times/bnb_manhattan.txt", delimiter=",", unpack=False),
+           'Euclidean': np.loadtxt("figures_data/run_times/bnb_euclidean.txt", delimiter=",", unpack=False)}
+
     results = results_dataframe(a_star, bnb)
 
     sns.boxplot(x='Algorithm', y='Run Time', hue='Heuristic', data=results, palette="Set3")
@@ -212,19 +217,18 @@ def plot_heuristics():
     plt.show()
 
 
-def plot_algorithms():
-
+def plot_run_times():
     results = {
         'A*': [0.09871149063110352, 0.13067626953125, 0.7476649284362793,
-                            0.024929285049438477, 0.4218897819519043, 0.09474515914916992, 0.33011531829833984,
-                            0.06250691413879395, 0.04688739776611328, 0.4061143398284912,
-                            0.4061288833618164, 0.04686331748962402, 1.7651846408843994, 0.07810592651367188,
-                            0.1601276397705078, 0.0153961181640625, 0.3796401023864746, 0.4100658893585205],
+               0.024929285049438477, 0.4218897819519043, 0.09474515914916992, 0.33011531829833984,
+               0.06250691413879395, 0.04688739776611328, 0.4061143398284912,
+               0.4061288833618164, 0.04686331748962402, 1.7651846408843994, 0.07810592651367188,
+               0.1601276397705078, 0.0153961181640625, 0.3796401023864746, 0.4100658893585205],
         'B&B': [0.1406230926513672, 0.12566328048706055, 0.2872292995452881, 2.813910961151123,
-                         0.01994633674621582, 0.5666520595550537, 0.12366795539855957, 0.28024983406066895,
-                         2.510826587677002, 0.1249704360961914, 0.03124237060546875, 0.2812058925628662,
-                         0.39055514335632324, 0.06246161460876465, 2.1870031356811523, 0.06246066093444824,
-                         0.11495161056518555, 0.005006551742553711, 0.429948091506958, 0.43488597869873047]
+                0.01994633674621582, 0.5666520595550537, 0.12366795539855957, 0.28024983406066895,
+                2.510826587677002, 0.1249704360961914, 0.03124237060546875, 0.2812058925628662,
+                0.39055514335632324, 0.06246161460876465, 2.1870031356811523, 0.06246066093444824,
+                0.11495161056518555, 0.005006551742553711, 0.429948091506958, 0.43488597869873047]
     }
 
     # Create DataFrame from the result dict
@@ -239,17 +243,15 @@ def plot_algorithms():
 
 
 def plot_comparison():
+    # plot_depths()
 
-    plot_heuristics()
-
-    plot_algorithms()
+    plot_run_times()
 
 
 def plot_depths():
-
-    bfs = np.loadtxt("figures_data/depths_bfs.txt", comments="#", delimiter=",", unpack=False)
-    dfs = np.loadtxt("figures_data/depths_dfs.txt", comments="#", delimiter=",", unpack=False)
-    a_star = np.loadtxt("figures_data/depths_astar.txt", comments="#", delimiter=",", unpack=False)
+    bfs = np.loadtxt("figures_data/depths/depths_bfs.txt", comments="#", delimiter=",", unpack=False)
+    dfs = np.loadtxt("figures_data/depths/depths_dfs.txt", comments="#", delimiter=",", unpack=False)
+    a_star = np.loadtxt("figures_data/depths/depths_astar.txt", comments="#", delimiter=",", unpack=False)
 
     fig, axs = plt.subplots(3)
 
@@ -277,12 +279,11 @@ def plot_depths():
 
 
 if __name__ == '__main__':
-
     # Solve a random single 8-puzzle and print the solution
-    # solve_puzzle()
+    solve_puzzle()
 
     # Compare algorithms solving the 8-puzzle
-    compare_algorithms()
+    # compare_algorithms()
 
     # Plot comparison figures
     # plot_comparison()
