@@ -3,8 +3,8 @@
 ## 8-Puzzle Solver
 
 Implementation of A* and Branch & Bound algorithms to solve 8-puzzle.
-The implementation of the B&B algorithm consist on Best-First
-in order to improve run time.
+The implementation of the B&B algorithm can also get an search type. Currently, 
+we implemented Depth-First search and Breadth-First search.
 
 ### Project Structure
 
@@ -24,3 +24,6 @@ contains the following heuristics:
 1. `main.py` - Script with an example of using the solver. Additionally, 
 a comparison between the algorithms and heuristics and couple of 
 plots for the comparison.
+The `solve_puzzle` function in the main is an interactive solver which get from the user
+his preferred algorithm, search approach and heuristic function and solve a random puzzle.
+ 
