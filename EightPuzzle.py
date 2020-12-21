@@ -104,9 +104,11 @@ class EightPuzzle:
             current_children.sort(key=lambda x: x.lb)
 
             if search_type.lower() == 'dfs':
+                # Insert current children to the beginning of the list
                 open_states = current_children + open_states
 
             elif search_type.lower() == 'bfs':
+                # Insert current children to the end of the list
                 open_states += current_children
 
         if verbose & (solution is not None):
