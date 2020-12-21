@@ -32,20 +32,6 @@ def user_choose_solver():
         except KeyError:
             print('Please choose one of the requested letters')
 
-    # Choose search type
-    if algorithm == 'bnb':
-        types = {'d': 'dfs', 'b': 'bfs'}
-
-        while True:
-            try:
-                user_type = input('DFS (d) or BFS (b)?\n').lower()
-                search_type = types[user_type]
-                break
-            except KeyError:
-                print('Please choose one of the requested letters')
-    else:
-        search_type = None
-
     # Choose h function
     h_functions = {'ma': h_manhattan, 'e': h_euclidean, 'mi': h_misplaced}
     while True:
@@ -60,7 +46,7 @@ def user_choose_solver():
 
             print('Please choose one of the requested letters')
 
-    return algorithm, search_type, h_function
+    return algorithm, h_function
 
 
 def solve_puzzle():
@@ -76,11 +62,11 @@ def solve_puzzle():
     init_state = EightPuzzle.init_table()
 
     # Get the user solver preferences
-    algorithm, search_type, h_function = user_choose_solver()
+    algorithm, h_function = user_choose_solver()
 
     # Solve the init table
     puzzle = EightPuzzle(init_state, goal_state)
-    solution = puzzle.solve(algorithm, h_function, search_type)
+    solution = puzzle.solve(algorithm, h_function)
 
     # Print solution
     print('Solution Way:')
@@ -213,27 +199,27 @@ def plot_depths():
     dfs = np.loadtxt("figures_data/depths/depths_dfs.txt", comments="#", delimiter=",", unpack=False)
     a_star = np.loadtxt("figures_data/depths/depths_astar.txt", comments="#", delimiter=",", unpack=False)
 
-    fig, axs = plt.subplots(3)
+    fig, axs = plt.subplots(2)
 
     # Plot
     axs[0].plot(a_star)
-    axs[1].plot(dfs)
-    axs[2].plot(bfs, label='Current Depth')
+    axs[1].plot(dfs, label='Current Depth')
 
     # Add titles
     axs[0].set_title('A* - Best-First')
     axs[1].set_title('B&B - DFS')
-    axs[2].set_title('B&B - BFS')
 
     # Add axis-labels
-    axs[2].set_xlabel('Iterations')
+    axs[0].set_xlabel('Iterations')
+    axs[1].set_xlabel('Iterations')
     axs[1].set_ylabel('Depth')
+    axs[0].set_ylabel('Depth')
 
     for ax in axs:
         ax.set_xticks([])
         ax.axhline(17, color='red', linestyle='--', label='Solution Depth')
 
-    axs[2].legend(loc='lower right', bbox_to_anchor=(1, 0))
+    axs[1].legend(loc='lower right', bbox_to_anchor=(1, 1))
 
     plt.show()
 

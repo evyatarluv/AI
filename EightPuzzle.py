@@ -37,7 +37,7 @@ class EightPuzzle:
 
         return self.reconstruct_solution(self.solution)
 
-    def bnb_solve(self, h_function, search_type, verbose=True, init_ub=np.inf):
+    def bnb_solve(self, h_function, search_type='dfs', verbose=True, init_ub=np.inf):
         """
         This method implement Branch & Bound algorithm.
         The implementation define according to the search_type argument with to search depth first or breadth first.
@@ -50,7 +50,7 @@ class EightPuzzle:
 
         # Ensure the search type
         if search_type.lower() not in ['bfs', 'dfs']:
-            raise NotImplementedError('The search type is not implemented yet.')
+            raise NotImplementedError('The search traverse was not implemented yet.')
 
         # Init params
         solution = None
