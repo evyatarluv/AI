@@ -1,5 +1,3 @@
-# Artificial Intelligence Projects
-
 ## 8-Puzzle Solver
 
 Implementation of A* and Branch & Bound algorithms to solve 8-puzzle.
