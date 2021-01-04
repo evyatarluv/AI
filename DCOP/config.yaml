@@ -1,0 +1,9 @@
+
+environment:
+  n_agents: 30
+  n_domain: 10
+
+constraints:
+  cost_range: !!python/tuple [1,10]
+  problem_density: 0.2
+  filename: constraints/agent_{}.pickle
