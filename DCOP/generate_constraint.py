@@ -8,7 +8,6 @@ from itertools import combinations
 import numpy as np
 import pickle
 
-# todo: add documentation for functions
 
 def generate_constraints_dict(vertex, config):
 
@@ -32,10 +31,11 @@ def generate_constraints_dict(vertex, config):
 
 def export_constraints(constraints, config):
     """
-
-    :param config:
-    :param constraints:
-    :return:
+    Export the constraints as dict for each agent.
+    The exported file saves as pickle file.
+    :param config: configuration dict
+    :param constraints: dict with all the constraints where the key is the vertex and the constraints as ndarray
+    :return: dict where the other agent is the key and the constraints as ndarray
     """
     constraints_filename = config['constraints']['filename']
     n_agent = config['environment']['n_agents']
@@ -53,30 +53,44 @@ def export_constraints(constraints, config):
         pickle.dump(costs, open(constraints_filename.format(agent), 'wb'))
 
 
-def choose_vertex(all_vertex, config):
+def choose_vertex(all_vertices, config):
+    """
+    This function get a list with all the optional vertex as list of tuples
+    and choose the vertex which be in use.
+    :param all_vertices: list of tuples with all the optional vertex in the graph
+    :param config: configuration file
+    :return: list of tuples with the chosen vertex
+    """
+    m = config['constraints']['problem_density'] * len(all_vertices)
 
-    m = config['constraints']['problem_density'] * len(all_vertex)
+    vertex_idx = np.random.choice(len(all_vertices), int(m), replace=False)
 
-    vertex_idx = np.random.choice(len(all_vertex), int(m), replace=False)
-
-    return [all_vertex[i] for i in vertex_idx]
+    return [all_vertices[i] for i in vertex_idx]
 
 
 def generate_constraints():
-
+    """
+    The main function of the script.
+    Using the configuration yaml file and generate dict of constraints for each agent.
+    The exported file saves as pickle file.
+    :return:
+    """
     # Load configuration file
     config = yaml.full_load(open('config.yaml'))
 
+    # Set seed
+    np.random.seed(config['constraints']['seed'])
+
     # Generate all the possible vertex
-    all_vertex = list(combinations(range(30), 2))
+    all_vertices = list(combinations(range(30), 2))
 
     # Choose vertex according to the density of the problem
-    vertex = choose_vertex(all_vertex, config)
+    vertices = choose_vertex(all_vertices, config)
 
     # Generate ndarray constraint matrix for each vertex
-    constraints = generate_constraints_dict(vertex, config)
+    constraints = generate_constraints_dict(vertices, config)
 
-    # Export the generated constrints
+    # Export the generated constraints
     export_constraints(constraints, config)
 
 
