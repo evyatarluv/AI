@@ -39,11 +39,11 @@ class DSA(Agent):
         # Send the current value
         self.send_message(mailer, self.value)
 
-    def find_best_value(self, neighbors_values: Dict[int, int]):
+    def find_best_value(self, neighbors_values: Dict[int, int]) -> int:
         """
-
-        :param neighbors_values:
-        :return:
+        The method compute the best current value according to the neighbors' values
+        :param neighbors_values: dict with the neighbors values as {neighbor: value}
+        :return: best possible value as int
         """
 
         costs = dict()
@@ -60,10 +60,10 @@ class DSA(Agent):
 
     def replacement_decision(self, new_value: int, neighbors_values: Dict[int, int]):
         """
-
-        :param new_value:
-        :param neighbors_values:
-        :return:
+        The method decide if to replace the agent's value or to stay with the current value.
+        :param new_value: value the agent want to change to
+        :param neighbors_values: the current values of the agent's neighbors
+        :return: bool answer, replace or not
         """
 
         new_cost = self.compute_cost(new_value, neighbors_values)

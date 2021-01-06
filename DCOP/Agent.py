@@ -16,10 +16,11 @@ class Agent:
 
     def compute_cost(self, value: int, neighbors_values: Dict[int, int]) -> float:
         """
-
-        :param neighbors_values:
-        :param value:
-        :return:
+        The method compute the cost the agent pay according to a given value
+        and a given neighbors' values
+        :param neighbors_values: dict with the neighbors values in the form {neighbor: value}
+        :param value: the value of the agent
+        :return: cost as float
         """
 
         value_cost = 0
