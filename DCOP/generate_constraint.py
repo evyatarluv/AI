@@ -48,7 +48,7 @@ def export_constraints(constraints, config):
     :param constraints: dict with all the constraints where the key is the vertex and the constraints as ndarray
     :return: dict where the other agent is the key and the constraints as ndarray
     """
-    constraints_filename = config['constraints']['filename']
+    constraints_filename = config['constraints']['filename']['constraints']
     n_agent = config['environment']['n_agents']
     agents_constraints = {a: {} for a in range(n_agent)}  # example: {agent: {other_agent: costs, ...}, ...}
 
@@ -68,15 +68,23 @@ def choose_vertex(all_vertices, config):
     """
     This function get a list with all the optional vertex as list of tuples
     and choose the vertex which be in use.
+    Additionally the function export the vertices which chosen.
     :param all_vertices: list of tuples with all the optional vertex in the graph
-    :param config: configuration file
+    :param config: configuration dict
     :return: list of tuples with the chosen vertex
     """
+    # Get the problem density and compute number of vertices
     m = config['constraints']['problem_density'] * len(all_vertices)
 
+    # Randomize vertices
     vertex_idx = np.random.choice(len(all_vertices), int(m), replace=False)
+    vertices = [all_vertices[i] for i in vertex_idx]
 
-    return [all_vertices[i] for i in vertex_idx]
+    # Export vertices as pickle file
+    filename = config['constraints']['filename']['vertices']
+    pickle.dump(vertices, open(filename, 'wb'))
+
+    return vertices
 
 
 def generate_constraints():
