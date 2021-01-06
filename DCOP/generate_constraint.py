@@ -20,11 +20,22 @@ def generate_constraints_dict(vertex, config):
 
     n_domain = config['environment']['n_domain']
     cost_range = config['constraints']['cost_range']
+    toughness = config['constraints']['problem_toughness']
     constraints = {}
 
+    # Compute amount of zeros and non-zeros
+    zeros = int((1 - toughness) * (n_domain ** 2))
+    non_zeros = (n_domain ** 2) - zeros
+
+    # Create constraints for each vertex
     for v in vertex:
 
-        constraints[v] = np.random.randint(cost_range[0], cost_range[1], (n_domain, n_domain))
+        # Create the constraint according the toughness
+        constraint = ([0] * zeros) + list(np.random.randint(cost_range[0], cost_range[1], non_zeros))
+        np.random.shuffle(constraint)
+
+        # Append the constraint
+        constraints[v] = np.reshape(constraint, (n_domain, n_domain))
 
     return constraints
 
@@ -94,4 +105,4 @@ def generate_constraints():
     export_constraints(constraints, config)
 
 
-# generate_constraints()
+generate_constraints()
