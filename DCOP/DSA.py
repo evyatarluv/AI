@@ -30,7 +30,7 @@ class DSA(Agent):
 
         self.p = p  # type: float
 
-        if dsa_type.lower() in ['c']:
+        if dsa_type.lower() in ['c', 'a']:
             self.dsa_type = dsa_type  # type: str
         else:
             raise NotImplementedError('Not implemented DSA type')
@@ -88,6 +88,7 @@ class DSA(Agent):
         current_cost = self.compute_cost(self.value, neighbors_values)
 
         # Choose the replacement decision according to DSA type
+
         # C - new cost better or equal
         if self.dsa_type.lower() == 'c':
             if new_cost <= current_cost:
@@ -98,7 +99,17 @@ class DSA(Agent):
 
             return False
 
-        # todo: Add other DSA types, i.e., A, B, ....
+        # A - new cost better
+        if self.dsa_type.lower() == 'a':
+            if new_cost < current_cost:
+
+                if np.random.random() < self.p:
+
+                    return True
+
+            return False
+
+        # todo: Add other DSA types, i.e. B
 
 
 
