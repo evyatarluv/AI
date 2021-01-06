@@ -1,6 +1,7 @@
 from .Agent import Agent
+from .Mailer import Mailer
 from .Message import Message
-from typing import List
+from typing import List, Dict
 import numpy as np
 
 
@@ -17,22 +18,31 @@ class DSA(Agent):
         else:
             raise NotImplementedError('Not implemented DSA type')
 
-    def iteration(self, messages: List[Message]):
+    def iteration(self, mailer: Mailer):
         """
 
-        :param messages:
+        :param mailer:
         :return:
         """
-        new_value = self.find_best_value(messages)
 
-        if self.replacement_decision(new_value, messages):
+        # Get the current messages as neighbors' values
+        neighbors_values = {m.sender: m.content for m in mailer.get_messages(self.id)}
+
+        # Find the current best value
+        new_value = self.find_best_value(neighbors_values)
+
+        # Choose if to replace the current value
+        if self.replacement_decision(new_value, neighbors_values):
 
             self.value = new_value
 
-    def find_best_value(self, messages: List[Message]):
+        # Send the current value
+        self.send_message(mailer, self.value)
+
+    def find_best_value(self, neighbors_values: Dict[int, int]):
         """
 
-        :param messages:
+        :param neighbors_values:
         :return:
         """
 
@@ -43,21 +53,23 @@ class DSA(Agent):
 
             if value != self.value:
 
-                costs[value] = self.compute_cost(value, messages)
+                costs[value] = self.compute_cost(value, neighbors_values)
 
+        # Return the value which has the minimum cost
         return min(costs, key=costs.get)
 
-    def replacement_decision(self, new_value, messages):
+    def replacement_decision(self, new_value: int, neighbors_values: Dict[int, int]):
         """
 
         :param new_value:
-        :param messages:
+        :param neighbors_values:
         :return:
         """
 
-        new_cost = self.compute_cost(new_value, messages)
-        current_cost = self.compute_cost(self.value, messages)
+        new_cost = self.compute_cost(new_value, neighbors_values)
+        current_cost = self.compute_cost(self.value, neighbors_values)
 
+        # Choose the replacement decision according to DSA type
         # C - new cost better or equal
         if self.type.lower() == 'c':
             if new_cost <= current_cost:

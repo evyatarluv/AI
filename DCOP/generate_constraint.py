@@ -18,7 +18,7 @@ def generate_constraints_dict(vertex, config):
     :return: dict where each key is a tuple and the value is ndarray.
     """
 
-    n_domain = len(config['environment']['domain'])
+    n_domain = config['environment']['n_domain']
     cost_range = config['constraints']['cost_range']
     toughness = config['constraints']['problem_toughness']
     constraints = {}
@@ -87,15 +87,13 @@ def choose_vertex(all_vertices, config):
     return vertices
 
 
-def generate_constraints():
+def generate_constraints(config):
     """
     The main function of the script.
     Using the configuration yaml file and generate dict of constraints for each agent.
     The exported file saves as pickle file.
     :return:
     """
-    # Load configuration file
-    config = yaml.full_load(open('config.yaml'))
 
     # Set seed
     np.random.seed(config['constraints']['seed'])
