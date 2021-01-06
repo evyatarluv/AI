@@ -6,7 +6,20 @@ from .Mailer import Mailer
 
 
 class Agent:
+    """
+    A class representing an agent in a distributed environment
 
+    todo: feel up the docstring
+
+    Attributes
+    ----------
+
+    agent_id: int
+        the id of the agent
+
+
+
+    """
     def __init__(self, agent_id, constraints, domain):
 
         self.id = agent_id  # type: int
@@ -44,6 +57,3 @@ class Agent:
         for neighbor in self.constraints.keys():
 
             mailer.deliver_message(self.id, neighbor, content)
-
-
-
