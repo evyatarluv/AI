@@ -18,7 +18,7 @@ def generate_constraints_dict(vertex, config):
     :return: dict where each key is a tuple and the value is ndarray.
     """
 
-    n_domain = config['environment']['n_domain']
+    n_domain = len(config['environment']['domain'])
     cost_range = config['constraints']['cost_range']
     toughness = config['constraints']['problem_toughness']
     constraints = {}
