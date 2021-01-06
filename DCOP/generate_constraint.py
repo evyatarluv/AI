@@ -56,7 +56,7 @@ def export_constraints(constraints, config):
     for variables, cost in constraints.items():
 
         agents_constraints[variables[0]][variables[1]] = cost
-        agents_constraints[variables[1]][variables[0]] = cost
+        agents_constraints[variables[1]][variables[0]] = cost.T
 
     # For each agent export the constraints dict
     for agent, costs in agents_constraints.items():

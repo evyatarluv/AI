@@ -22,7 +22,7 @@ class Mailer:
         except KeyError:
             return []
 
-    def deliver_messages(self, sender, recipient, content):
+    def deliver_message(self, sender, recipient, content):
 
         """
         The method create a message and append it to delivered messages list.
