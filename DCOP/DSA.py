@@ -6,22 +6,40 @@ import numpy as np
 
 
 class DSA(Agent):
+    """
+    A class used to represent a DSA agent
+
+    Attributes
+    ----------
+    agent_id : int
+        the id of the agent
+    constraints : Dict[int, np.array]
+        the constraints of the agent as a dict where the keys are neighbors' id and value
+        is the cost matrix
+    domain : List[int]
+        the domain of the agent
+    dsa_type : str
+        the type of the DSA agent as 'A', 'B' or 'C', currently only C implemented
+    p: float
+        the probability to replace decision, between 0 to 1.
+    """
 
     def __init__(self, agent_id, constraints, domain, dsa_type, p):
 
         super().__init__(agent_id, constraints, domain)
+
         self.p = p  # type: float
 
-        # Init DSA type
         if dsa_type.lower() in ['c']:
-            self.type = dsa_type  # type: str
+            self.dsa_type = dsa_type  # type: str
         else:
             raise NotImplementedError('Not implemented DSA type')
 
     def iteration(self, mailer: Mailer):
         """
-
-        :param mailer:
+        The method is an iteration of an DSA agent.
+        The method gets a mailer for getting and sending the agents' messages
+        :param mailer: Mailer object which hold all the messages
         :return:
         """
 
@@ -71,7 +89,7 @@ class DSA(Agent):
 
         # Choose the replacement decision according to DSA type
         # C - new cost better or equal
-        if self.type.lower() == 'c':
+        if self.dsa_type.lower() == 'c':
             if new_cost <= current_cost:
 
                 if np.random.random() < self.p:
