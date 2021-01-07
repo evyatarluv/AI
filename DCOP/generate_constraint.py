@@ -6,11 +6,16 @@ The script create n constraint for each agent. Each constraint is a dict where t
 id and the value is the cost matrix, i.e., {neighbor: costs}.
 
 """
+import os
+
 import yaml
 from itertools import combinations
 import numpy as np
 import pickle
 from typing import List, Tuple, Dict, Any
+from pathlib import Path
+
+root_project = Path(__file__).parent.parent
 
 
 def generate_constraints_dict(edges: List[Tuple[int, int]],
@@ -53,7 +58,7 @@ def export_constraints(constraints, config):
     :param constraints: dict with all the constraints where the key is the edge and the constraints as ndarray
     :return: dict where the other agent is the key and the constraints as ndarray
     """
-    constraints_filename = config['constraints']['filename']['constraints']
+    constraints_filename = os.path.join(root_project, config['constraints']['filename']['constraints'])
     n_agent = config['environment']['n_agents']
     agents_constraints = {a: {} for a in range(n_agent)}  # example: {agent: {other_agent: costs, ...}, ...}
 
@@ -87,7 +92,7 @@ def choose_edges(all_edges: List[Tuple[int, int]],
     edges = [all_edges[i] for i in edges_idx]
 
     # Export vertices as pickle file
-    filename = config['constraints']['filename']['edges']
+    filename = os.path.join(root_project, config['constraints']['filename']['edges'])
     pickle.dump(edges, open(filename, 'wb'))
 
     return edges

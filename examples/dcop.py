@@ -24,7 +24,7 @@ def init_agents(mailer: Mailer, config):
     agents_type = config['environment']['agents_type']
     n_agents = config['environment']['n_agents']
     domain = range(config['environment']['n_domain'])
-    constraint_filename = 'DCOP/' + config['constraints']['filename']['constraints']
+    constraint_filename = config['constraints']['filename']['constraints']
     agents = []
 
     # Init agents according to the agent type
@@ -81,7 +81,7 @@ def main():
     config = yaml.full_load(open(config_path))
 
     # If we don't have constraints generate them
-    # generate_constraints(config)
+    generate_constraints(config)
 
     # Init params
     mailer = Mailer()

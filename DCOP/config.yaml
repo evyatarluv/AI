@@ -11,8 +11,8 @@ constraints:
   problem_density: 0.2  # i.e., p1
   problem_toughness: 0.2  # i.e., p2
   filename:
-    constraints: constraints/agent_{}.pickle
-    edges: constraints/edges.pickle
+    constraints: DCOP/constraints/agent_{}.pickle
+    edges: DCOP/constraints/edges.pickle
 
 DSA:
   type: C
