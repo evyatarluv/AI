@@ -9,7 +9,7 @@ constraints:
   seed: 42
   cost_range: !!python/tuple [1,10]
   problem_density: 0.5  # i.e., p1
-  problem_toughness: 0.2  # i.e., p2
+  problem_toughness: 0.5  # i.e., p2
   filename:
     constraints: DCOP/constraints/agent_{}.pickle
     edges: DCOP/constraints/edges.pickle

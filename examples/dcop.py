@@ -92,7 +92,7 @@ def main():
     config = yaml.full_load(open(config_path))
 
     # If we don't have constraints generate them
-    # generate_constraints(config)
+    generate_constraints(config)
 
     # Init params
     mailer = Mailer()
