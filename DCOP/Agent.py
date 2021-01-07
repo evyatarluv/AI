@@ -9,17 +9,24 @@ class Agent:
     """
     A class representing an agent in a distributed environment
 
-    todo: feel up the docstring
-
     Attributes
     ----------
 
     agent_id: int
         the id of the agent
 
+    constraints: dict
+        the constraints of the agent, as a dict, where neighbor is the key and the value is cost
+        matrix as numpy ndarray.
 
+    domain: list
+        the list with the domain of the agent, each value is a int
+
+    value: int
+        the value from the domain which the agent selected as the current assignment
 
     """
+
     def __init__(self, agent_id, constraints, domain):
 
         self.id = agent_id  # type: int

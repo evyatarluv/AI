@@ -18,7 +18,7 @@ root_project = Path(__file__).parent.parent
 
 
 def generate_constraints_dict(edges: List[Tuple[int, int]],
-                              config: Dict[str, Any]):
+                              config: Dict[str, Any]) -> Dict[Tuple[int, int], np.array]:
 
     """
     The function get list of tuples and for each tuple generate constraint matrix costs.
@@ -49,7 +49,8 @@ def generate_constraints_dict(edges: List[Tuple[int, int]],
     return constraints
 
 
-def export_constraints(constraints, config):
+def export_constraints(constraints: Dict[Tuple[int, int], np.array],
+                       config: Dict[str, Any]):
     """
     Export the constraints as dict for each agent.
     The exported file saves as pickle file.
