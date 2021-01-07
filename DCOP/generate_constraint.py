@@ -110,7 +110,7 @@ def generate_constraints(config: Dict[str, Any]):
     np.random.seed(config['constraints']['seed'])
 
     # Generate all the possible edges
-    all_edges = list(combinations(range(30), 2))
+    all_edges = list(combinations(range(config['environment']['n_agents']), 2))
 
     # Choose edges according to the density of the problem
     edges = choose_edges(all_edges, config)

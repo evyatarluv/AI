@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from DCOP.Mailer import Mailer
 from DCOP.DSA import DSA
 from DCOP.Agent import Agent
@@ -60,6 +62,9 @@ def compute_total_cost(agents: List[Agent]):
 
     total_cost = 0
 
+    # Debug - print all agents values
+    # print({a.id: a.value for a in agents})
+
     for a in agents:
 
         neighbors_values = {}
@@ -74,6 +79,12 @@ def compute_total_cost(agents: List[Agent]):
     return total_cost
 
 
+def plot_cost(total_cost):
+
+    plt.plot(total_cost)
+    plt.show()
+
+
 def main():
 
     # Load configuration file
@@ -81,7 +92,7 @@ def main():
     config = yaml.full_load(open(config_path))
 
     # If we don't have constraints generate them
-    generate_constraints(config)
+    # generate_constraints(config)
 
     # Init params
     mailer = Mailer()
@@ -90,7 +101,7 @@ def main():
     total_cost = []
 
     # Solve
-    for i in range(n_iteration):
+    for i in tqdm(range(n_iteration)):
 
         # Move messages to inbox
         mailer.assign_messages()
@@ -104,8 +115,7 @@ def main():
         total_cost.append(compute_total_cost(agents))
 
     # Plot cost
-    plt.plot(total_cost)
-    plt.show()
+    plot_cost(total_cost)
 
 
 if __name__ == '__main__':
