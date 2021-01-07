@@ -7,7 +7,6 @@ id and the value is the cost matrix, i.e., {neighbor: costs}.
 
 """
 import os
-
 import yaml
 from itertools import combinations
 import numpy as np

@@ -3,7 +3,7 @@ from tqdm import tqdm
 from DCOP.Mailer import Mailer
 from DCOP.DSA import DSA
 from DCOP.Agent import Agent
-from DCOP.generate_constraint import generate_constraints
+from examples.generate_constraint import generate_constraints
 import yaml
 import pickle
 from typing import List, Dict
