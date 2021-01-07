@@ -12,7 +12,7 @@ constraints:
   problem_toughness: 0.2  # i.e., p2
   filename:
     constraints: constraints/agent_{}.pickle
-    vertices: constraints/vertices.pickle
+    edges: constraints/edges.pickle
 
 DSA:
   type: C

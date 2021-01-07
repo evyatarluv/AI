@@ -2,19 +2,24 @@
 
 This script responsible for generating random constraint for DCOP.
 
+The script create n constraint for each agent. Each constraint is a dict where the key is the neighbor
+id and the value is the cost matrix, i.e., {neighbor: costs}.
+
 """
 import yaml
 from itertools import combinations
 import numpy as np
 import pickle
+from typing import List, Tuple, Dict, Any
 
 
-def generate_constraints_dict(vertex, config):
+def generate_constraints_dict(edges: List[Tuple[int, int]],
+                              config: Dict[str, Any]):
 
     """
     The function get list of tuples and for each tuple generate constraint matrix costs.
     :param config: configuration dict
-    :param vertex: list of tuples
+    :param edges: list of tuples
     :return: dict where each key is a tuple and the value is ndarray.
     """
 
@@ -27,15 +32,15 @@ def generate_constraints_dict(vertex, config):
     zeros = int((1 - toughness) * (n_domain ** 2))
     non_zeros = (n_domain ** 2) - zeros
 
-    # Create constraints for each vertex
-    for v in vertex:
+    # Create constraints for each edge
+    for e in edges:
 
         # Create the constraint according the toughness
         constraint = ([0] * zeros) + list(np.random.randint(cost_range[0], cost_range[1], non_zeros))
         np.random.shuffle(constraint)
 
         # Append the constraint
-        constraints[v] = np.reshape(constraint, (n_domain, n_domain))
+        constraints[e] = np.reshape(constraint, (n_domain, n_domain))
 
     return constraints
 
@@ -45,7 +50,7 @@ def export_constraints(constraints, config):
     Export the constraints as dict for each agent.
     The exported file saves as pickle file.
     :param config: configuration dict
-    :param constraints: dict with all the constraints where the key is the vertex and the constraints as ndarray
+    :param constraints: dict with all the constraints where the key is the edge and the constraints as ndarray
     :return: dict where the other agent is the key and the constraints as ndarray
     """
     constraints_filename = config['constraints']['filename']['constraints']
@@ -64,30 +69,31 @@ def export_constraints(constraints, config):
         pickle.dump(costs, open(constraints_filename.format(agent), 'wb'))
 
 
-def choose_vertex(all_vertices, config):
+def choose_edges(all_edges: List[Tuple[int, int]],
+                 config: Dict[str, Any]) -> List[Tuple[int, int]]:
     """
-    This function get a list with all the optional vertex as list of tuples
-    and choose the vertex which be in use.
-    Additionally the function export the vertices which chosen.
-    :param all_vertices: list of tuples with all the optional vertex in the graph
+    This function get a list with all the optional edges as list of tuples
+    and choose the edges which be in use.
+    Additionally the function export the edges which chosen.
+    :param all_edges: list of tuples with all the optional edges in the graph
     :param config: configuration dict
-    :return: list of tuples with the chosen vertex
+    :return: list of tuples with the chosen edges
     """
-    # Get the problem density and compute number of vertices
-    m = config['constraints']['problem_density'] * len(all_vertices)
+    # Get the problem density and compute number of edges
+    m = config['constraints']['problem_density'] * len(all_edges)
 
     # Randomize vertices
-    vertex_idx = np.random.choice(len(all_vertices), int(m), replace=False)
-    vertices = [all_vertices[i] for i in vertex_idx]
+    edges_idx = np.random.choice(len(all_edges), int(m), replace=False)
+    edges = [all_edges[i] for i in edges_idx]
 
     # Export vertices as pickle file
-    filename = config['constraints']['filename']['vertices']
-    pickle.dump(vertices, open(filename, 'wb'))
+    filename = config['constraints']['filename']['edges']
+    pickle.dump(edges, open(filename, 'wb'))
 
-    return vertices
+    return edges
 
 
-def generate_constraints(config):
+def generate_constraints(config: Dict[str, Any]):
     """
     The main function of the script.
     Using the configuration yaml file and generate dict of constraints for each agent.
@@ -98,17 +104,14 @@ def generate_constraints(config):
     # Set seed
     np.random.seed(config['constraints']['seed'])
 
-    # Generate all the possible vertex
-    all_vertices = list(combinations(range(30), 2))
+    # Generate all the possible edges
+    all_edges = list(combinations(range(30), 2))
 
-    # Choose vertex according to the density of the problem
-    vertices = choose_vertex(all_vertices, config)
+    # Choose edges according to the density of the problem
+    edges = choose_edges(all_edges, config)
 
     # Generate ndarray constraint matrix for each vertex
-    constraints = generate_constraints_dict(vertices, config)
+    constraints = generate_constraints_dict(edges, config)
 
     # Export the generated constraints
     export_constraints(constraints, config)
-
-
-generate_constraints()

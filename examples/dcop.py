@@ -1,12 +1,15 @@
 from DCOP.Mailer import Mailer
 from DCOP.DSA import DSA
 from DCOP.Agent import Agent
-# import DCOP.generate_constraint as constraint
+from DCOP.generate_constraint import generate_constraints
 import yaml
 import pickle
 from typing import List, Dict
 import os
 from pathlib import Path
+
+# Project root directory
+root_directory = Path(__file__).parent.parent
 
 
 def init_agents(mailer: Mailer, config):
@@ -29,7 +32,7 @@ def init_agents(mailer: Mailer, config):
         for i in range(n_agents):
 
             # Init DSA params
-            constraint_path = os.path.join(Path(__file__).parent.parent, constraint_filename)
+            constraint_path = os.path.join(root_directory, constraint_filename)
             constraints = pickle.load(open(constraint_path.format(i), 'rb'))
             dsa_type = config['DSA']['type']
             p = config['DSA']['p']
@@ -51,11 +54,11 @@ def init_agents(mailer: Mailer, config):
 def main():
 
     # Load configuration file
-    config_path = os.path.join(Path(__file__).parent.parent, 'DCOP/config.yaml')
+    config_path = os.path.join(root_directory, 'DCOP/config.yaml')
     config = yaml.full_load(open(config_path))
 
     # If we don't have constraints generate them
-    # constraint.generate_constraints(config)
+    # generate_constraints(config)
 
     # Init params
     mailer = Mailer()
