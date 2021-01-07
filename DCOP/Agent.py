@@ -57,3 +57,7 @@ class Agent:
         for neighbor in self.constraints.keys():
 
             mailer.deliver_message(self.id, neighbor, content)
+
+    def get_neighbors(self):
+
+        return list(self.constraints.keys())

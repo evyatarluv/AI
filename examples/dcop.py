@@ -7,6 +7,7 @@ import pickle
 from typing import List, Dict
 import os
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 # Project root directory
 root_directory = Path(__file__).parent.parent
@@ -51,6 +52,28 @@ def init_agents(mailer: Mailer, config):
     return agents
 
 
+def compute_total_cost(agents: List[Agent]):
+    """
+
+    :return:
+    """
+
+    total_cost = 0
+
+    for a in agents:
+
+        neighbors_values = {}
+
+        for n in a.get_neighbors():
+
+            neighbors_values[n] = agents[n].value
+
+        total_cost += a.compute_cost(a.value, neighbors_values)
+
+    # todo: think if we need to divide it by 2
+    return total_cost
+
+
 def main():
 
     # Load configuration file
@@ -64,6 +87,7 @@ def main():
     mailer = Mailer()
     agents = init_agents(mailer, config)
     n_iteration = config['environment']['n_iteration']
+    total_cost = []
 
     # Solve
     for i in range(n_iteration):
@@ -76,7 +100,12 @@ def main():
 
             a.iteration(mailer)
 
-        # todo: Compute current iteration cost
+        # Update total cost
+        total_cost.append(compute_total_cost(agents))
+
+    # Plot cost
+    plt.plot(total_cost)
+    plt.show()
 
 
 if __name__ == '__main__':
