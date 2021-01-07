@@ -3,7 +3,12 @@
 This script responsible for generating random constraint for DCOP.
 
 The script create n constraint for each agent. Each constraint is a dict where the key is the neighbor
-id and the value is the cost matrix, i.e., {neighbor: costs}.
+id and the value is the cost matrix, i.e., constraints look as follows:
+{ neighbor_id (int): costs (ndarray), ..... }
+
+The script create n constraints according to the agents' amount.
+
+Other configurations like constraints' filename, n_domain, n_agents can be found in the `config.yaml` file.
 
 """
 import os
@@ -74,20 +79,20 @@ def export_constraints(constraints: Dict[Tuple[int, int], np.array],
         pickle.dump(costs, open(constraints_filename.format(agent), 'wb'))
 
 
-def choose_edges(all_edges: List[Tuple[int, int]],
-                 config: Dict[str, Any]) -> List[Tuple[int, int]]:
+def choose_edges(config: Dict[str, Any]) -> List[Tuple[int, int]]:
     """
     This function get a list with all the optional edges as list of tuples
     and choose the edges which be in use.
     Additionally the function export the edges which chosen.
-    :param all_edges: list of tuples with all the optional edges in the graph
     :param config: configuration dict
     :return: list of tuples with the chosen edges
     """
+
     # Get the problem density and compute number of edges
     m = config['constraints']['problem_density'] * len(all_edges)
 
-    # Randomize vertices
+    # Choose randomize edges
+    all_edges = list(combinations(range(config['environment']['n_agents']), 2))
     edges_idx = np.random.choice(len(all_edges), int(m), replace=False)
     edges = [all_edges[i] for i in edges_idx]
 
@@ -101,7 +106,7 @@ def choose_edges(all_edges: List[Tuple[int, int]],
 def generate_constraints(config: Dict[str, Any]):
     """
     The main function of the script.
-    Using the configuration yaml file and generate dict of constraints for each agent.
+    Using the configuration yaml file to generate dict of constraints for each agent.
     The exported file saves as pickle file.
     :return:
     """
@@ -109,11 +114,8 @@ def generate_constraints(config: Dict[str, Any]):
     # Set seed
     np.random.seed(config['constraints']['seed'])
 
-    # Generate all the possible edges
-    all_edges = list(combinations(range(config['environment']['n_agents']), 2))
-
     # Choose edges according to the density of the problem
-    edges = choose_edges(all_edges, config)
+    edges = choose_edges(config)
 
     # Generate ndarray constraint matrix for each vertex
     constraints = generate_constraints_dict(edges, config)
