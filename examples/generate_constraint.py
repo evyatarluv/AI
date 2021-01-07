@@ -12,13 +12,13 @@ Other configurations like constraints' filename, n_domain, n_agents can be found
 
 """
 import os
-import yaml
 from itertools import combinations
 import numpy as np
 import pickle
 from typing import List, Tuple, Dict, Any
 from pathlib import Path
 
+# Root project directory
 root_project = Path(__file__).parent.parent
 
 

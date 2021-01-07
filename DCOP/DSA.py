@@ -1,6 +1,5 @@
 from .Agent import Agent
 from .Mailer import Mailer
-from .Message import Message
 from typing import List, Dict
 import numpy as np
 
@@ -28,10 +27,10 @@ class DSA(Agent):
 
         super().__init__(agent_id, constraints, domain)
 
-        self.p = p  # type: float
+        self.p: float = p
 
         if dsa_type.lower() in ['c', 'a']:
-            self.dsa_type = dsa_type  # type: str
+            self.dsa_type: str = dsa_type
         else:
             raise NotImplementedError('Not implemented DSA type')
 

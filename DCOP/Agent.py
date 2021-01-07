@@ -1,6 +1,4 @@
 import numpy as np
-import pickle
-from .Message import Message
 from typing import List, Dict, Any
 from .Mailer import Mailer
 
@@ -29,10 +27,10 @@ class Agent:
 
     def __init__(self, agent_id, constraints, domain):
 
-        self.id = agent_id  # type: int
-        self.constraints = constraints  # type: Dict[int, np.array]
-        self.domain = domain  # type: List[int]
-        self.value = np.random.choice(domain)  # type: int
+        self.id: int = agent_id
+        self.constraints: Dict[int, np.array] = constraints
+        self.domain: List[int] = domain
+        self.value: int = np.random.choice(domain)
 
     def compute_cost(self, value: int, neighbors_values: Dict[int, int]) -> float:
         """
@@ -65,6 +63,6 @@ class Agent:
 
             mailer.deliver_message(self.id, neighbor, content)
 
-    def get_neighbors(self):
+    def get_neighbors(self) -> List[int]:
 
         return list(self.constraints.keys())
