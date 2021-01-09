@@ -88,11 +88,11 @@ def choose_edges(config: Dict[str, Any]) -> List[Tuple[int, int]]:
     :return: list of tuples with the chosen edges
     """
 
-    # Get the problem density and compute number of edges
+    # Create all edges
+    all_edges = list(combinations(range(config['environment']['n_agents']), 2))
     m = config['constraints']['problem_density'] * len(all_edges)
 
-    # Choose randomize edges
-    all_edges = list(combinations(range(config['environment']['n_agents']), 2))
+    # Choose edges according given problem density
     edges_idx = np.random.choice(len(all_edges), int(m), replace=False)
     edges = [all_edges[i] for i in edges_idx]
 

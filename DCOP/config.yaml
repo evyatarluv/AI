@@ -1,7 +1,7 @@
 
 environment:
   n_iteration: 1000
-  agents_type: dsa
+  agents_type: mgm2
   n_agents: 30
   n_domain: 10
 
@@ -19,4 +19,5 @@ DSA:
   p: 0.7
 
 MGM2:
+  iterations_in_cycle: 5
   offer_probability: 0.5

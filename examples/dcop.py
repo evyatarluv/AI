@@ -1,5 +1,5 @@
 from tqdm import tqdm
-
+from DCOP.MGM2 import MGM2
 from DCOP.Mailer import Mailer
 from DCOP.DSA import DSA
 from DCOP.Agent import Agent
@@ -27,31 +27,44 @@ def init_agents(mailer: Mailer, config):
     n_agents = config['environment']['n_agents']
     domain = range(config['environment']['n_domain'])
     constraint_filename = config['constraints']['filename']['constraints']
+    n_iteration = config['environment']['n_iteration']
     agents = []
 
-    # Init agents according to the agent type
-    if agents_type.lower() == 'dsa':
+    # Create agents
+    for i in range(n_agents):
 
-        for i in range(n_agents):
+        # Load agent's constraints
+        constraint_path = os.path.join(root_directory, constraint_filename)
+        constraints = pickle.load(open(constraint_path.format(i), 'rb'))
+
+        # Init agents according to the agent type
+        if agents_type.lower() == 'dsa':
 
             # Init DSA params
-            constraint_path = os.path.join(root_directory, constraint_filename)
-            constraints = pickle.load(open(constraint_path.format(i), 'rb'))
             dsa_type = config['DSA']['type']
             p = config['DSA']['p']
 
             # Create agent and send value to neighbors
             a = DSA(i, constraints, domain, dsa_type, p)
-            a.send_message(mailer, a.value)
 
-            # Append the agent
-            agents.append(a)
+        elif agents_type.lower() == 'mgm2':
 
-    elif agents_type.lower() == 'mgm2':
+            # Init MGM2 params
+            # todo: think of something wiser
+            n_iteration = config['MGM2']['iterations_in_cycle'] * config['environment']['n_iteration']
+            offer_prob = config['MGM2']['offer_probability']
 
-        raise NotImplementedError('MGM2 init agents')
+            # Create agent
+            a = MGM2(i, constraints, domain, offer_prob)
 
-    return agents
+        else:
+            raise NotImplementedError('Not implemented agent type')
+
+        # Send value to neighbors append the agent
+        a.send_message(mailer, a.value)
+        agents.append(a)
+
+    return agents, n_iteration
 
 
 def compute_total_cost(agents: List[Agent]):
@@ -96,12 +109,11 @@ def main():
 
     # Init params
     mailer = Mailer()
-    agents = init_agents(mailer, config)
-    n_iteration = config['environment']['n_iteration']
+    agents, n_iterations = init_agents(mailer, config)
     total_cost = []
 
     # Solve
-    for i in tqdm(range(n_iteration)):
+    for i in tqdm(range(n_iterations)):
 
         # Move messages to inbox
         mailer.assign_messages()
