@@ -32,10 +32,7 @@ class MGM2(Agent):
         self.iteration_switcher[self.iteration_count](mailer)
 
         # Update iteration counter
-        if self.iteration_count == 5:
-            self.iteration_count = 1
-        else:
-            self.iteration_count += 1
+        self.iteration_count += 1 if self.iteration_count < 5 else 1
 
     def commit_offers(self, mailer: Mailer):
 
