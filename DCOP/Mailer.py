@@ -9,7 +9,7 @@ class Mailer:
         self.mailbox = dict()  # type: Dict[int, List[Message]]
         self.delivered = []  # type: List[Message]
 
-    def get_messages(self, recipient):
+    def get_messages(self, recipient) -> List[Message]:
         """
         Method to get all the messages of a given recipient
         :param recipient: recipient id
@@ -32,7 +32,7 @@ class Mailer:
         :return: none
         """
 
-        msg = Message(sender , recipient, content)
+        msg = Message(sender, recipient, content)
 
         self.delivered.append(msg)
 

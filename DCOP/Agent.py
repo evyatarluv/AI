@@ -31,6 +31,7 @@ class Agent:
         self.constraints: Dict[int, np.array] = constraints
         self.domain: List[int] = domain
         self.value: int = np.random.choice(domain)
+        self.neighbors: List[int] = list(self.constraints.keys())
 
     def compute_cost(self, value: int, neighbors_values: Dict[int, int]) -> float:
         """
@@ -62,7 +63,3 @@ class Agent:
         for neighbor in self.constraints.keys():
 
             mailer.deliver_message(self.id, neighbor, content)
-
-    def get_neighbors(self) -> List[int]:
-
-        return list(self.constraints.keys())

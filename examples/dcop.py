@@ -69,7 +69,7 @@ def compute_total_cost(agents: List[Agent]):
 
         neighbors_values = {}
 
-        for n in a.get_neighbors():
+        for n in a.neighbors:
 
             neighbors_values[n] = agents[n].value
 

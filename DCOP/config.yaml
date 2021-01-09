@@ -17,3 +17,6 @@ constraints:
 DSA:
   type: C
   p: 0.7
+
+MGM2:
+  offer_probability: 0.5
