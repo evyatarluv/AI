@@ -52,11 +52,8 @@ class MGM2(Agent):
 
     def _send_offer(self, mailer: Mailer, neighbor: int):
 
-        # Create the offer message
-        offer = {'neighbors_values': self._neighbors_values,
-                 'constraints': self._constraints,
-                 'value': self.value,
-                 }
+        # Create the offer
+        offer = Offer(self._neighbors_values, self._constraints, self.value)
 
         # Send the offer to the neighbor
         mailer.deliver_message(self.id, neighbor, offer, 'offer')
@@ -64,7 +61,7 @@ class MGM2(Agent):
     def _create_pairs(self, mailer: Mailer):
 
         # Get all offers
-        offers = {m.sender: m.content for m in mailer.get_messages(self.id)}
+        offers: Dict[int, Offer] = {m.sender: m.content for m in mailer.get_messages(self.id)}
 
         # If the agent committed an offer -
         # answer `no` to all offers
@@ -74,7 +71,6 @@ class MGM2(Agent):
             response = {'accept': False}
 
             for sender in offers.keys():
-
                 mailer.deliver_message(self.id, sender, response, 'response')
 
         # If the agent didn't committed an offer -
@@ -100,8 +96,63 @@ class MGM2(Agent):
                 mailer.deliver_message(self.id, sender, response, 'response')
 
     def _find_best_offer(self, offers: Dict[int, Any]):
+
+        # todo: fill this up
         pass
 
 
+class Offer:
+    """
+    Class for representing an offer of one agent to another
+
+    Attributes:
+    ----------
+
+        neighbors_values: (dict)
+            the values of the bidder's neighbors as a dict where each neighbor is a key and the neighbor's
+            value as a value.
+
+        constraints: (dict)
+            the constraints of the bidder, where each neighbor is a key and the matrix cost as a value.
+
+        value: (int)
+            the current value of the bidder.
+
+    """
+    def __init__(self, neighbors_values, constraints, value):
+        self.neighbors_values: Dict[int, int] = neighbors_values
+        self.constraints: Dict[int, np.array] = constraints
+        self.value: int = value
 
 
+class Response:
+    """
+    Class representing a response for an offer.
+
+    Attributes:
+    ----------
+
+        accept: (bool)
+            True for accept the offer and False for reject it.
+
+        gain: (float)
+            the gain for changing from the current bidder's value to the new value
+
+        value: (int)
+            the value of bidder that the responder compute as the best new value
+
+
+    """
+    def __init__(self, accept, gain=None, value=None):
+
+        self.accept = accept
+
+        if accept:
+            if (value is None) or (gain is None):
+                raise ValueError(
+                    'If you send an accept message, you must send the neighbor'
+                    'value and the global gain in it too'
+                )
+
+        self.value: int = value
+        self.gain: float = gain
