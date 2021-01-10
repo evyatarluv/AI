@@ -70,6 +70,7 @@ class MGM2(Agent):
         # answer `no` to all offers
         if self._committed:
 
+            # Create the response message
             response = {'accept': False}
 
             for sender in offers.keys():
