@@ -1,11 +1,10 @@
 from .Agent import Agent
 from .Mailer import Mailer
 import numpy as np
-from typing import List, Dict, Any
+from typing import List, Dict, Callable
 
 
 class MGM2(Agent):
-
     """
     A class representing an agent implementing MGM-2 algorithm
     """
@@ -18,13 +17,12 @@ class MGM2(Agent):
         self._neighbors_values: Dict[int, int] = {}
         self._committed: bool = False
         self._offer_prob: float = offer_prob
-        self._iteration_switcher = {1: self._commit_offers,
-                                    2: None,
-                                    3: None,
-                                    4: None,
-                                    5: None,
-                                    }
-        # todo: MGM2 other attributes
+        self._iteration_switcher: Dict[int, Callable] = {1: self._commit_offers,
+                                                         2: None,
+                                                         3: None,
+                                                         4: None,
+                                                         5: None,
+                                                         }
 
     def iteration(self, mailer: Mailer):
 
@@ -62,4 +60,3 @@ class MGM2(Agent):
 
         # Send the offer to the neighbor
         mailer.deliver_message(self.id, neighbor, offer)
-
