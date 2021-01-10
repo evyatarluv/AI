@@ -28,10 +28,10 @@ class Agent:
     def __init__(self, agent_id, constraints, domain):
 
         self.id: int = agent_id
-        self.constraints: Dict[int, np.array] = constraints
-        self.domain: List[int] = domain
+        self._constraints: Dict[int, np.array] = constraints
+        self._domain: List[int] = domain
         self.value: int = np.random.choice(domain)
-        self.neighbors: List[int] = list(self.constraints.keys())
+        self.neighbors: List[int] = list(self._constraints.keys())
 
     def compute_cost(self, value: int, neighbors_values: Dict[int, int]) -> float:
         """
@@ -47,7 +47,7 @@ class Agent:
         # How much it will cost given my neighbor values
         for neighbor, neighbor_value in neighbors_values.items():
 
-            value_cost += self.constraints[neighbor][value][neighbor_value]
+            value_cost += self._constraints[neighbor][value][neighbor_value]
 
         return value_cost
 
@@ -60,6 +60,6 @@ class Agent:
         :return:
         """
 
-        for neighbor in self.constraints.keys():
+        for neighbor in self._constraints.keys():
 
             mailer.deliver_message(self.id, neighbor, content)
