@@ -35,3 +35,4 @@ class Message:
 
         return 'Title: {} From: {}, To: {}, Content: {}'.format(self.title, self.sender,
                                                                 self.recipient, self.content)
+

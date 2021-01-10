@@ -1,7 +1,7 @@
 from .Agent import Agent
 from .Mailer import Mailer
 import numpy as np
-from typing import List, Dict, Callable
+from typing import List, Dict, Callable, Any
 
 
 class MGM2(Agent):
@@ -80,5 +80,28 @@ class MGM2(Agent):
         # If the agent didn't committed an offer -
         # choose the best offer and response with `yes`
         else:
-            pass
+
+            # Get the neighbor, gain & value which corresponded to the best offer
+            best_neighbor, gain, value = self._find_best_offer(offers)
+
+            # Accept the best offer reject all others
+            for sender in offers.keys():
+
+                # Create the response message according the sender
+                if sender == best_neighbor:
+
+                    response = {'accept': True, 'gain': gain, 'value': value}
+
+                else:
+
+                    response = {'accept': False}
+
+                # Send the message
+                mailer.deliver_message(self.id, sender, response, 'response')
+
+    def _find_best_offer(self, offers: Dict[int, Any]):
+        pass
+
+
+
 
