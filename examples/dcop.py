@@ -60,8 +60,8 @@ def init_agents(mailer: Mailer, config):
         else:
             raise NotImplementedError('Not implemented agent type')
 
-        # Send value to neighbors append the agent
-        a.send_message(mailer, a.value, 'value')
+        # Send value to neighbors & append the agent
+        a.send_value_messages(mailer)
         agents.append(a)
 
     return agents, n_iteration
@@ -77,20 +77,17 @@ def compute_total_cost(agents: List[Agent]):
     agents_values = {a.id: a.value for a in agents}
 
     for a in agents:
-
         total_cost += a.compute_cost(a.value, agents_values)
 
     return total_cost
 
 
 def plot_cost(total_cost):
-
     plt.plot(total_cost)
     plt.show()
 
 
 def main():
-
     # Load configuration file
     config_path = os.path.join(root_directory, 'DCOP/config.yaml')
     config = yaml.full_load(open(config_path))
@@ -104,14 +101,13 @@ def main():
     total_cost = []
 
     # Solve
-    for i in tqdm(range(n_iterations)):
+    for _ in tqdm(range(n_iterations)):
 
         # Move messages to inbox
         mailer.assign_messages()
 
         # Run each agent iteration
         for a in agents:
-
             a.iteration(mailer)
 
         # Update total cost
@@ -122,5 +118,4 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()

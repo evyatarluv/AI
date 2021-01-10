@@ -58,16 +58,14 @@ class Agent:
 
         return value_cost
 
-    def send_message(self, mailer: Mailer, content: Any, title: str):
+    def send_value_messages(self, mailer: Mailer):
         """
         The method gets a mailer and content and send the content to all
         the agent neighbors.
-        :param title: title of the message
-        :param content: content to send the neighbors
-        :param mailer: mailer to use in order to send the messages
+        :param mailer: mailer to use in order to send the value messages
         :return:
         """
 
         for neighbor in self._constraints.keys():
 
-            mailer.deliver_message(self.id, neighbor, content, title)
+            mailer.deliver_message(self.id, neighbor, self.value, 'value')

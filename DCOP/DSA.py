@@ -54,7 +54,7 @@ class DSA(Agent):
             self.value = new_value
 
         # Send the current value
-        self.send_message(mailer, self.value, 'value')
+        self.send_value_messages(mailer)
 
     def _find_best_value(self, neighbors_values: Dict[int, int]) -> int:
         """

@@ -18,7 +18,7 @@ class MGM2(Agent):
         self._committed: bool = False
         self._offer_prob: float = offer_prob
         self._iteration_switcher: Dict[int, Callable] = {1: self._commit_offers,
-                                                         2: None,
+                                                         2: self._create_pairs,
                                                          3: None,
                                                          4: None,
                                                          5: None,
@@ -60,3 +60,24 @@ class MGM2(Agent):
 
         # Send the offer to the neighbor
         mailer.deliver_message(self.id, neighbor, offer, 'offer')
+
+    def _create_pairs(self, mailer: Mailer):
+
+        # Get all offers
+        offers = {m.sender: m.content for m in mailer.get_messages(self.id)}
+
+        # If the agent committed an offer -
+        # answer `no` to all offers
+        if self._committed:
+
+            response = {'accept': False}
+
+            for sender in offers.keys():
+
+                mailer.deliver_message(self.id, sender, response, 'response')
+
+        # If the agent didn't committed an offer -
+        # choose the best offer and response with `yes`
+        else:
+            pass
+
