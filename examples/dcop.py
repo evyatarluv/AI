@@ -61,7 +61,7 @@ def init_agents(mailer: Mailer, config):
             raise NotImplementedError('Not implemented agent type')
 
         # Send value to neighbors append the agent
-        a.send_message(mailer, a.value)
+        a.send_message(mailer, a.value, 'value')
         agents.append(a)
 
     return agents, n_iteration

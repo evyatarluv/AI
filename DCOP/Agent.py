@@ -14,7 +14,7 @@ class Agent:
         the id of the agent
 
     constraints: dict
-        the constraints of the agent, as a dict, where neighbor is the key and the value is cost
+        the constraints of the agent as a dict, where neighbor is the key and the value is cost
         matrix as numpy ndarray.
 
     domain: list
@@ -58,10 +58,11 @@ class Agent:
 
         return value_cost
 
-    def send_message(self, mailer: Mailer, content: Any):
+    def send_message(self, mailer: Mailer, content: Any, title: str):
         """
         The method gets a mailer and content and send the content to all
         the agent neighbors.
+        :param title: title of the message
         :param content: content to send the neighbors
         :param mailer: mailer to use in order to send the messages
         :return:
@@ -69,4 +70,4 @@ class Agent:
 
         for neighbor in self._constraints.keys():
 
-            mailer.deliver_message(self.id, neighbor, content)
+            mailer.deliver_message(self.id, neighbor, content, title)

@@ -1,15 +1,18 @@
+from typing import Any
 
 
 class Message:
 
-    def __init__(self, sender, recipient, content):
+    # todo: add class docstrings
 
-        self.sender = sender
-        self.recipient = recipient
-        self.content = content
+    def __init__(self, sender, recipient, content, title='message'):
 
-        # todo: title to messages? maybe can help to debug later...
+        self.sender: int = sender
+        self.recipient: int = recipient
+        self.content: Any = content
+        self.title: str = title
 
     def __str__(self):
 
-        return 'From: {}, To: {}, Content: {}'.format(self.sender, self.recipient, self.content)
+        return 'Title: {} From: {}, To: {}, Content: {}'.format(self.title, self.sender,
+                                                                self.recipient, self.content)

@@ -43,7 +43,7 @@ class MGM2(Agent):
             self._committed = True
 
             # Choose neighbor and send offer
-            neighbor = np.random.choice(self.neighbors)
+            neighbor = np.random.choice(self._neighbors)
             self._send_offer(mailer, neighbor)
 
         else:
@@ -59,4 +59,4 @@ class MGM2(Agent):
                  }
 
         # Send the offer to the neighbor
-        mailer.deliver_message(self.id, neighbor, offer)
+        mailer.deliver_message(self.id, neighbor, offer, 'offer')
