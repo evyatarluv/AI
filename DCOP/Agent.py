@@ -31,23 +31,30 @@ class Agent:
         self._constraints: Dict[int, np.array] = constraints
         self._domain: List[int] = domain
         self.value: int = np.random.choice(domain)
-        self.neighbors: List[int] = list(self._constraints.keys())
+        self._neighbors: List[int] = list(self._constraints.keys())
 
-    def compute_cost(self, value: int, neighbors_values: Dict[int, int]) -> float:
+    def compute_cost(self, value: int, agents_values: Dict[int, int]) -> float:
         """
         The method compute the cost the agent pay according to a given value
-        and a given neighbors' values
-        :param neighbors_values: dict with the neighbors values in the form {neighbor: value}
+        and a given other agents' values
+        :param agents_values: dict with the agents values in the form {agent: value}
         :param value: the value of the agent
         :return: cost as float
         """
 
         value_cost = 0
 
-        # How much it will cost given my neighbor values
-        for neighbor, neighbor_value in neighbors_values.items():
+        # Find the cost for each neighbor
+        for n in self._neighbors:
 
-            value_cost += self._constraints[neighbor][value][neighbor_value]
+            # Get the neighbor value from the `agents_values` arg
+            try:
+                neighbor_value = agents_values[n]
+            except KeyError:
+                raise KeyError('The neighbor {} is missing from the agents` values dict'.format(n))
+
+            # Update the current cost
+            value_cost += self._constraints[n][value][neighbor_value]
 
         return value_cost
 

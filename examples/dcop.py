@@ -74,21 +74,12 @@ def compute_total_cost(agents: List[Agent]):
     """
 
     total_cost = 0
-
-    # Debug - print all agents values
-    # print({a.id: a.value for a in agents})
+    agents_values = {a.id: a.value for a in agents}
 
     for a in agents:
 
-        neighbors_values = {}
+        total_cost += a.compute_cost(a.value, agents_values)
 
-        for n in a.neighbors:
-
-            neighbors_values[n] = agents[n].value
-
-        total_cost += a.compute_cost(a.value, neighbors_values)
-
-    # todo: think if we need to divide it by 2
     return total_cost
 
 
