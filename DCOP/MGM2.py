@@ -168,7 +168,7 @@ class MGM2(Agent):
 
             if len(offers) > 0:
 
-                # Get the neighbor, gain & value which corresponded to the best offer
+                # Find the best value and update attributes
                 partner_value = self._find_best_offer(offers)
 
                 # Accept the best offer reject all others
@@ -186,8 +186,20 @@ class MGM2(Agent):
                     # Send the message
                     mailer.deliver_message(self.id, sender, response, 'response')
 
-    def _find_best_offer(self, offers: Dict[int, Offer]):
+    def _find_best_offer(self, offers: Dict[int, Offer]) -> int:
+        """
+        The method get a dict of offers as { agent_id: Offer } and find the best offer.
 
+        For each offer and sender the method runs over all the values combination and find the
+        best combination (the one with the lowest cost). For the lowest cost the method computes
+        the corresponding gain and the gain and the values which lead to this gain.
+
+        Next, the method find the best gain and update the partner, the new value and the shared gain.
+
+        The method returns the partner's value in order to send it to the partner as a message.
+        :param offers: dict with all the offers as value and bidder as key.
+        :return: partner's values, int
+        """
         gains: Dict[int, Tuple] = {}  # dict: { bidder: ( (my new value, partner new value), shared gain ) }
 
         # For each offer find the best new values for both of us
@@ -242,12 +254,14 @@ class MGM2(Agent):
     def compute_pair_cost(agent_1: Tuple, agent_2: Tuple):
 
         """
-        todo: docstring
+        Compute the cost of pair of agents.
+
         Each agent consist of the following tuple:
-        (id, value, neighbors_values, constraints)
-        :param agent_1:
-        :param agent_2:
-        :return:
+            (id, value, neighbors_values, constraints)
+
+        :param agent_1: first agent from the pair
+        :param agent_2: second agent from the pair
+        :return: cost of the pair
         """
 
         # Unpacking agents
