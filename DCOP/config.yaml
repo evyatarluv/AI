@@ -1,7 +1,7 @@
 
 environment:
   n_iteration: 1000
-  agents_type: dsa
+  agents_type: mgm2
   n_agents: 30
   n_domain: 10
 

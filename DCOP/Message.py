@@ -31,6 +31,6 @@ class Message:
 
     def __str__(self):
 
-        return 'Title: {} From: {}, To: {}, Content: {}'.format(self.title, self.sender,
+        return 'Title: {}, From: {}, To: {}, Content: {}'.format(self.title, self.sender,
                                                                 self.recipient, self.content)
 

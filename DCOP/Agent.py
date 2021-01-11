@@ -69,3 +69,25 @@ class Agent:
         for neighbor in self._constraints.keys():
 
             mailer.deliver_message(self.id, neighbor, self.value, 'value')
+
+    @staticmethod
+    def agent_cost(value: int, neighbors_values: Dict[int, int],
+                   constraints: Dict[int, np.array]) -> float:
+
+        """
+        todo: docstrings
+        :param value:
+        :param neighbors_values:
+        :param constraints:
+        :return:
+        """
+
+        value_cost = 0
+
+        # Find the cost for each neighbor
+        for neighbor, neighbor_value in neighbors_values.items():
+
+            # Update the current cost
+            value_cost += constraints[neighbor][value][neighbor_value]
+
+        return value_cost

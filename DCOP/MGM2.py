@@ -1,8 +1,9 @@
 from .Agent import Agent
 from .Mailer import Mailer
 import numpy as np
-from typing import List, Dict, Callable, Any
-
+from typing import List, Dict, Callable, Any, Tuple
+from itertools import product
+from copy import deepcopy
 
 class Offer:
     """
@@ -21,11 +22,14 @@ class Offer:
         value: (int)
             the current value of the bidder.
 
+        domain: (List[int])
+            # todo: explain
     """
-    def __init__(self, neighbors_values, constraints, value):
-        self.neighbors_values: Dict[int, int] = neighbors_values
-        self.constraints: Dict[int, np.array] = constraints
+    def __init__(self, neighbors_values, constraints, value, domain):
+        self.neighbors_values: Dict[int, int] = deepcopy(neighbors_values)
+        self.constraints: Dict[int, np.array] = deepcopy(constraints)
         self.value: int = value
+        self.domain: List[int] = deepcopy(domain)
 
 
 class Response:
@@ -114,13 +118,14 @@ class MGM2(Agent):
             neighbor = np.random.choice(self._neighbors)
 
             # Create & send the offer
-            offer = Offer(self._neighbors_values, self._constraints, self.value)
+            offer = Offer(self._neighbors_values, self._constraints, self.value, self._domain)
             mailer.deliver_message(self.id, neighbor, offer, 'offer')
 
         else:
 
-            self.committed = False
+            self._committed = False
 
+    # todo: change the method name
     def _create_pairs(self, mailer: Mailer):
         """
         Method for iteration #2.
@@ -152,15 +157,15 @@ class MGM2(Agent):
         else:
 
             # Get the neighbor, gain & value which corresponded to the best offer
-            best_neighbor, gain, value = self._find_best_offer(offers)
+            self_value, partner, partner_value, gain = self._find_best_offer(offers)
 
             # Accept the best offer reject all others
             for sender in offers.keys():
 
                 # Create the response message according the sender
-                if sender == best_neighbor:
+                if sender == partner:
 
-                    response = Response(accept=True, gain=gain, value=value)
+                    response = Response(accept=True, gain=gain, value=partner_value)
 
                 else:
 
@@ -171,5 +176,70 @@ class MGM2(Agent):
 
     def _find_best_offer(self, offers: Dict[int, Offer]):
 
-        # todo: fill this up
-        pass
+        gains: Dict[int, Tuple] = {}
+
+        for sender, o in offers.items():
+
+            current_cost = MGM2.compute_pair_cost(
+                agent_1=(self.id, self.value, self._neighbors_values, self._constraints),
+                agent_2=(sender, o.value, o.neighbors_values, o.constraints)
+            )
+
+            costs: Dict[Tuple: float] = {}
+
+            for self_value, partner_value in product(self._domain, o.domain):
+
+                # Update self neighbors values
+                self_current_neighbors_values = deepcopy(self._neighbors_values)
+                self_current_neighbors_values[sender] = partner_value
+
+                # Update partner neighbors values
+                partner_current_neighbors_values = deepcopy(o.neighbors_values)
+                partner_current_neighbors_values[self.id] = self_value
+
+                # Compute new cost
+                new_cost = MGM2.compute_pair_cost(
+                    agent_1=(self.id, self_value, self_current_neighbors_values, self._constraints),
+                    agent_2=(sender, partner_value, partner_current_neighbors_values, o.constraints)
+                )
+
+                # Append the computed cost
+                costs[(self_value, partner_value)] = new_cost
+
+            # Get the assignments which lead to the best cost
+            best_values = min(costs, key=costs.get)
+            best_cost = costs[best_values]
+
+            # Update the best gain corresponding to the sender
+            gains[sender] = (best_values, current_cost - best_cost)
+
+        # todo: return values
+        return None, None, None, None
+
+    @staticmethod
+    def compute_pair_cost(agent_1: Tuple, agent_2: Tuple):
+
+        """
+        todo: docstring
+        Each agent consist of the following tuple:
+        (id, value, neighbors_values, constraints)
+        :param agent_1:
+        :param agent_2:
+        :return:
+        """
+
+        # Unpacking agents
+        self_id, self_value, self_neighbors_values, self_constraints = agent_1
+        partner_id, partner_value, partner_neighbors_values, partner_constraints = agent_2
+
+        # Compute costs
+        partner_cost = Agent.agent_cost(partner_value, partner_neighbors_values, partner_constraints)
+        self_cost = Agent.agent_cost(self_value, self_neighbors_values, self_constraints)
+        join_cost = self_constraints[partner_id][self_value][partner_value]
+
+        return partner_cost + self_cost - join_cost
+
+
+
+
+
