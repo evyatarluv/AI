@@ -16,11 +16,7 @@ class Mailer:
         :return: list with all the messages
         """
 
-        try:
-            return self.mailbox[recipient]
-
-        except KeyError:
-            return []
+        return self.mailbox.get(recipient, [])
 
     def deliver_message(self, sender: int, recipient: int, content: Any, title: str):
 
