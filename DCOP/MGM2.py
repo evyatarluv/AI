@@ -70,6 +70,12 @@ class Response:
 class MGM2(Agent):
     """
     A class representing an agent implementing MGM-2 algorithm
+
+    Attributes:
+    ----------
+
+    todo: add attributes explanation
+
     """
 
     def __init__(self, agent_id, constraints, domain, offer_prob):
@@ -113,10 +119,7 @@ class MGM2(Agent):
         """
 
         # Reset attributes
-        self._gain = None
-        self._partner = None
-        self._committed = None
-        self._new_value = None
+        self._reset_attributes()
 
         # Get the current messages as neighbors' values
         self._neighbors_values = {m.sender: m.content for m in mailer.get_messages(self.id)}
@@ -161,7 +164,7 @@ class MGM2(Agent):
             response = Response(accept=False)
 
             for sender in offers.keys():
-                mailer.deliver_message(self.id, sender, response, 'response')
+                mailer.deliver_message(self.id, sender, response, 'Response')
 
         # If the agent didn't committed an offer -
         # choose the best offer and response with `yes`
@@ -185,7 +188,7 @@ class MGM2(Agent):
                         response = Response(accept=False)
 
                     # Send the message
-                    mailer.deliver_message(self.id, sender, response, 'response')
+                    mailer.deliver_message(self.id, sender, response, 'Response')
 
     def _send_gain(self, mailer: Mailer):
         """
@@ -194,6 +197,7 @@ class MGM2(Agent):
         :return:
         """
 
+        # If an offer was committed - look for your response
         if self._committed:
 
             # Unpack the response from the message
@@ -208,23 +212,20 @@ class MGM2(Agent):
                 self._gain = response.gain
                 self._new_value = response.value
 
+            # If the partner reject my offer
             else:
 
                 self._compute_gain()
 
+        # fixme: Something here is not true - if committed=false maybe it is because I got
+        #  some offers, so if I received an offer I dont need compute_gain, I already got one.
+        #  Maybe the first if need to be: `if partner is not None` and then `if committed`.
+        #
         else:
 
             self._compute_gain()
 
         # todo: send the gain to all neighbors except the partner
-
-
-
-
-
-
-
-
 
     def _find_best_offer(self, offers: Dict[int, Offer]) -> int:
         """
@@ -240,7 +241,10 @@ class MGM2(Agent):
         :param offers: dict with all the offers as value and bidder as key.
         :return: partner's values, int
         """
-        gains: Dict[int, Tuple] = {}  # dict: { bidder: ( (my new value, partner new value), shared gain ) }
+
+        # Init gains dict with the form of:
+        # { bidder_id: {self_value: int, partner_value: int, gain: float} }
+        gains: Dict[int, Dict] = {}
 
         # For each offer find the best new values for both of us
         # Then save these values and there new cost
@@ -252,23 +256,23 @@ class MGM2(Agent):
             )
 
             best_cost = current_cost  # pair cost
-            best_values = (self.value, o.value)  # tuple as (my value, partner value)
+            best_values = (self.value, o.value)  # tuple as (my_value, partner_value)
 
-            # For each combination of the domains
+            # For each combination of assignments
             for self_value, partner_value in product(self._domain, o.domain):
 
-                # Update self neighbors values
-                self_current_neighbors_values = deepcopy(self._neighbors_values)
-                self_current_neighbors_values[sender] = partner_value
+                # Update current self neighbors values
+                self_neighbors_values = deepcopy(self._neighbors_values)
+                self_neighbors_values[sender] = partner_value
 
-                # Update partner neighbors values
-                partner_current_neighbors_values = deepcopy(o.neighbors_values)
-                partner_current_neighbors_values[self.id] = self_value
+                # Update current partner neighbors values
+                partner_neighbors_values = deepcopy(o.neighbors_values)
+                partner_neighbors_values[self.id] = self_value
 
                 # Compute new cost
                 new_cost = MGM2.compute_pair_cost(
-                    agent_1=(self.id, self_value, self_current_neighbors_values, self._constraints),
-                    agent_2=(sender, partner_value, partner_current_neighbors_values, o.constraints)
+                    agent_1=(self.id, self_value, self_neighbors_values, self._constraints),
+                    agent_2=(sender, partner_value, partner_neighbors_values, o.constraints)
                 )
 
                 # Update best cost and values
@@ -277,24 +281,36 @@ class MGM2(Agent):
                     best_values = (self_value, partner_value)
 
             # Update the best gain corresponding to the sender
-            gains[sender] = (best_values, current_cost - best_cost)
+            gains[sender] = {'self_value': best_values[0], 'partner_value': best_values[1],
+                             'gain': current_cost - best_cost}
 
         # Get the best partner corresponding to the max gain
-        best_partner = max(gains, key=lambda x: gains.get(x)[1])
+        best_partner = max(gains, key=lambda x: gains.get(x)['gain'])
 
         # Update partner, gain and new value
         self._partner = best_partner
-        self._gain = gains[best_partner][1]
-        self._new_value = gains[best_partner][0][0]
+        self._gain = gains[best_partner]['gain']
+        self._new_value = gains[best_partner]['self_value']
 
         # Return the partner new value
-        return gains[best_partner][0][1]
+        return gains[best_partner]['partner_value']
+
+    def _reset_attributes(self):
+        """
+        Reset attributes at the start of a cycle.
+        These attributes relevant to each iteration separately.
+        :return:
+        """
+
+        self._gain = None
+        self._partner = None
+        self._committed = None
+        self._new_value = None
 
     @staticmethod
     def compute_pair_cost(agent_1: Tuple, agent_2: Tuple):
-
         """
-        Compute the cost of pair of agents.
+        Compute the cost for pair of agents.
 
         Each agent consist of the following tuple:
             (id, value, neighbors_values, constraints)
