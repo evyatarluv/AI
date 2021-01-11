@@ -78,9 +78,9 @@ class MGM2(Agent):
         self._neighbors_values: Dict[int, int] = {}
         self._committed: bool = False
         self._offer_prob: float = offer_prob
-        self.partner = None
-        self.new_value = None
-        self.gain = None
+        self._partner = None
+        self._new_value = None
+        self._gain = None
         self._iteration_switcher: Dict[int, Callable] = {1: self._commit_offers,
                                                          2: self._create_pairs,
                                                          3: None,
@@ -109,6 +109,13 @@ class MGM2(Agent):
         :param mailer: mailer for getting and sending messages
         :return:
         """
+
+        # Reset attributes
+        self._gain = None
+        self._partner = None
+        self._committed = None
+        self._new_value = None
+
         # Get the current messages as neighbors' values
         self._neighbors_values = {m.sender: m.content for m in mailer.get_messages(self.id)}
 
@@ -158,24 +165,26 @@ class MGM2(Agent):
         # If the agent didn't committed an offer -
         # choose the best offer and response with `yes`
         else:
-            # todo: if offers is empty
-            # Get the neighbor, gain & value which corresponded to the best offer
-            partner_value = self._find_best_offer(offers)
 
-            # Accept the best offer reject all others
-            for sender in offers.keys():
+            if len(offers) > 0:
 
-                # Create the response message according the sender
-                if sender == partner:
+                # Get the neighbor, gain & value which corresponded to the best offer
+                partner_value = self._find_best_offer(offers)
 
-                    response = Response(accept=True, gain=gain, value=partner_value)
+                # Accept the best offer reject all others
+                for sender in offers.keys():
 
-                else:
+                    # Create the response message according the sender
+                    if sender == self._partner:
 
-                    response = Response(accept=False)
+                        response = Response(accept=True, gain=self._gain, value=partner_value)
 
-                # Send the message
-                mailer.deliver_message(self.id, sender, response, 'response')
+                    else:
+
+                        response = Response(accept=False)
+
+                    # Send the message
+                    mailer.deliver_message(self.id, sender, response, 'response')
 
     def _find_best_offer(self, offers: Dict[int, Offer]):
 
@@ -222,9 +231,9 @@ class MGM2(Agent):
         best_partner = max(gains, key=lambda x: gains.get(x)[1])
 
         # Update partner, gain and new value
-        self.partner = best_partner
-        self.gain = gains[best_partner][1]
-        self.new_value = gains[best_partner][0][0]
+        self._partner = best_partner
+        self._gain = gains[best_partner][1]
+        self._new_value = gains[best_partner][0][0]
 
         # Return the partner new value
         return gains[best_partner][0][1]
