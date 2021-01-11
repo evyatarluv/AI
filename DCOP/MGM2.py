@@ -78,6 +78,9 @@ class MGM2(Agent):
         self._neighbors_values: Dict[int, int] = {}
         self._committed: bool = False
         self._offer_prob: float = offer_prob
+        self.partner = None
+        self.new_value = None
+        self.gain = None
         self._iteration_switcher: Dict[int, Callable] = {1: self._commit_offers,
                                                          2: self._create_pairs,
                                                          3: None,
@@ -155,9 +158,9 @@ class MGM2(Agent):
         # If the agent didn't committed an offer -
         # choose the best offer and response with `yes`
         else:
-
+            # todo: if offers is empty
             # Get the neighbor, gain & value which corresponded to the best offer
-            self_value, partner, partner_value, gain = self._find_best_offer(offers)
+            partner_value = self._find_best_offer(offers)
 
             # Accept the best offer reject all others
             for sender in offers.keys():
@@ -176,8 +179,10 @@ class MGM2(Agent):
 
     def _find_best_offer(self, offers: Dict[int, Offer]):
 
-        gains: Dict[int, Tuple] = {}
+        gains: Dict[int, Tuple] = {}  # dict: { bidder: ( (my new value, partner new value), shared gain ) }
 
+        # For each offer find the best new values for both of us
+        # Then save these values and there new cost
         for sender, o in offers.items():
 
             current_cost = MGM2.compute_pair_cost(
@@ -185,8 +190,10 @@ class MGM2(Agent):
                 agent_2=(sender, o.value, o.neighbors_values, o.constraints)
             )
 
-            costs: Dict[Tuple: float] = {}
+            best_cost = current_cost  # pair cost
+            best_values = (self.value, o.value)  # tuple as (my value, partner value)
 
+            # For each combination of the domains
             for self_value, partner_value in product(self._domain, o.domain):
 
                 # Update self neighbors values
@@ -203,18 +210,24 @@ class MGM2(Agent):
                     agent_2=(sender, partner_value, partner_current_neighbors_values, o.constraints)
                 )
 
-                # Append the computed cost
-                costs[(self_value, partner_value)] = new_cost
-
-            # Get the assignments which lead to the best cost
-            best_values = min(costs, key=costs.get)
-            best_cost = costs[best_values]
+                # Update best cost and values
+                if new_cost < best_cost:
+                    best_cost = new_cost
+                    best_values = (self_value, partner_value)
 
             # Update the best gain corresponding to the sender
             gains[sender] = (best_values, current_cost - best_cost)
 
-        # todo: return values
-        return None, None, None, None
+        # Get the best partner corresponding to the max gain
+        best_partner = max(gains, key=lambda x: gains.get(x)[1])
+
+        # Update partner, gain and new value
+        self.partner = best_partner
+        self.gain = gains[best_partner][1]
+        self.new_value = gains[best_partner][0][0]
+
+        # Return the partner new value
+        return gains[best_partner][0][1]
 
     @staticmethod
     def compute_pair_cost(agent_1: Tuple, agent_2: Tuple):
