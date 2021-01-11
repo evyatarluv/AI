@@ -5,6 +5,7 @@ from typing import List, Dict, Callable, Any, Tuple
 from itertools import product
 from copy import deepcopy
 
+
 class Offer:
     """
     Class for representing an offer of one agent to another
@@ -23,8 +24,9 @@ class Offer:
             the current value of the bidder.
 
         domain: (List[int])
-            # todo: explain
+            the domain of the bidder.
     """
+
     def __init__(self, neighbors_values, constraints, value, domain):
         self.neighbors_values: Dict[int, int] = deepcopy(neighbors_values)
         self.constraints: Dict[int, np.array] = deepcopy(constraints)
@@ -82,8 +84,8 @@ class MGM2(Agent):
         self._new_value = None
         self._gain = None
         self._iteration_switcher: Dict[int, Callable] = {1: self._commit_offers,
-                                                         2: self._create_pairs,
-                                                         3: None,
+                                                         2: self._response_offers,
+                                                         3: self._send_gain,
                                                          4: None,
                                                          5: None,
                                                          }
@@ -135,8 +137,7 @@ class MGM2(Agent):
 
             self._committed = False
 
-    # todo: change the method name
-    def _create_pairs(self, mailer: Mailer):
+    def _response_offers(self, mailer: Mailer):
         """
         Method for iteration #2.
 
@@ -185,6 +186,45 @@ class MGM2(Agent):
 
                     # Send the message
                     mailer.deliver_message(self.id, sender, response, 'response')
+
+    def _send_gain(self, mailer: Mailer):
+        """
+        todo: add docstring
+        :param mailer:
+        :return:
+        """
+
+        if self._committed:
+
+            # Unpack the response from the message
+            sender: int = mailer.get_messages(self.id)[0].sender
+            response: Response = mailer.get_messages(self.id)[0].content
+
+            # If the partner accept my offer
+            if response.accept:
+
+                # Update attributes
+                self._partner = sender
+                self._gain = response.gain
+                self._new_value = response.value
+
+            else:
+
+                self._compute_gain()
+
+        else:
+
+            self._compute_gain()
+
+        # todo: send the gain to all neighbors except the partner
+
+
+
+
+
+
+
+
 
     def _find_best_offer(self, offers: Dict[int, Offer]) -> int:
         """

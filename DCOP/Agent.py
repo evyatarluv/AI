@@ -75,11 +75,11 @@ class Agent:
                    constraints: Dict[int, np.array]) -> float:
 
         """
-        todo: docstrings
-        :param value:
-        :param neighbors_values:
-        :param constraints:
-        :return:
+        Compute a cost for a given agent's attributes
+        :param value: the current value of the agent
+        :param neighbors_values: dict with all the agent's neighbors values
+        :param constraints: the constraints of the agents
+        :return: the current cost
         """
 
         value_cost = 0
