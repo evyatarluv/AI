@@ -192,8 +192,16 @@ class MGM2(Agent):
 
     def _send_gain(self, mailer: Mailer):
         """
-        todo: add docstring
-        :param mailer:
+        Method for iteration #3.
+
+        The agent does the following steps:
+
+            1. If the agent committed an offer and received a `accept` response then update
+                the partner gain and new value according the response message
+
+            2. Send the agent's gain to all his neighbors except the partner (if there is one)
+
+        :param mailer: mailer for getting and sending messages
         :return:
         """
 
@@ -212,8 +220,12 @@ class MGM2(Agent):
                 self._gain = response.gain
                 self._new_value = response.value
 
-        # todo: send the gain to all neighbors except the partner
-        # self._send_gain()
+        # Send the gain to all neighbors except the partner
+        for neighbor in self._neighbors:
+
+            if neighbor != self._partner:
+
+                mailer.deliver_message(self.id, neighbor, self._gain, 'Gain')
 
     def _find_best_offer(self, offers: Dict[int, Offer]) -> int:
         """
