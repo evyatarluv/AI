@@ -82,7 +82,14 @@ def compute_total_cost(agents: List[Agent]):
     return total_cost
 
 
-def plot_cost(total_cost):
+def plot_cost(total_cost, config):
+
+    agent_type = config['environment']['agents_type']
+    # todo: read cycle from config
+
+    if agent_type.lower() == 'mgm2':
+        total_cost = [total_cost[i] for i in range(5, len(total_cost), 5)]
+
     plt.plot(total_cost)
     plt.show()
 
@@ -114,7 +121,7 @@ def main():
         total_cost.append(compute_total_cost(agents))
 
     # Plot cost
-    plot_cost(total_cost)
+    plot_cost(total_cost, config)
 
 
 if __name__ == '__main__':
