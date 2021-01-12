@@ -118,11 +118,11 @@ class MGM2(Agent):
         :return:
         """
 
-        # Reset attributes
-        self._reset_attributes()
-
         # Get the current messages as neighbors' values
         self._neighbors_values = {m.sender: m.content for m in mailer.get_messages(self.id)}
+
+        # Reset attributes
+        self._reset_attributes()
 
         # Decide to offer or not
         if np.random.random() < self._offer_prob:
@@ -212,20 +212,8 @@ class MGM2(Agent):
                 self._gain = response.gain
                 self._new_value = response.value
 
-            # If the partner reject my offer
-            else:
-
-                self._compute_gain()
-
-        # fixme: Something here is not true - if committed=false maybe it is because I got
-        #  some offers, so if I received an offer I dont need compute_gain, I already got one.
-        #  Maybe the first if need to be: `if partner is not None` and then `if committed`.
-        #
-        else:
-
-            self._compute_gain()
-
         # todo: send the gain to all neighbors except the partner
+        # self._send_gain()
 
     def _find_best_offer(self, offers: Dict[int, Offer]) -> int:
         """
@@ -302,10 +290,33 @@ class MGM2(Agent):
         :return:
         """
 
+        # Attributes which back to default
         self._gain = None
         self._partner = None
         self._committed = None
         self._new_value = None
+
+        # Update gain and new value
+        self._update_gain()
+
+    def _update_gain(self):
+        """
+        The method find the best new value and the corresponding gain.
+        The method update these attributes.
+        :return:
+        """
+
+        gains = dict()
+        current_cost = self.compute_cost(self.value, self._neighbors_values)
+
+        # For each value in the domain find current gain
+        for value in self._domain:
+
+            gains[value] = self.compute_cost(value, self._neighbors_values) - current_cost
+
+        # Find the value with the max gain and update it
+        self._new_value = max(gains, key=gains.get)
+        self._gain = gains[self._new_value]
 
     @staticmethod
     def compute_pair_cost(agent_1: Tuple, agent_2: Tuple):
@@ -330,6 +341,8 @@ class MGM2(Agent):
         join_cost = self_constraints[partner_id][self_value][partner_value]
 
         return partner_cost + self_cost - join_cost
+
+
 
 
 
