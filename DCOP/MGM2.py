@@ -86,14 +86,15 @@ class MGM2(Agent):
         self._neighbors_values: Dict[int, int] = {}
         self._committed: bool = False
         self._offer_prob: float = offer_prob
-        self._partner = None
-        self._new_value = None
-        self._gain = None
+        self._partner: int = None
+        self._new_value: int = None
+        self._gain: float = None
+        self._change_value: bool = None
         self._iteration_switcher: Dict[int, Callable] = {1: self._commit_offers,
                                                          2: self._response_offers,
                                                          3: self._send_gain,
-                                                         4: None,
-                                                         5: None,
+                                                         4: self._find_max_gain,
+                                                         5: self._update_new_value,
                                                          }
 
     def iteration(self, mailer: Mailer):
@@ -227,6 +228,69 @@ class MGM2(Agent):
 
                 mailer.deliver_message(self.id, neighbor, self._gain, 'Gain')
 
+    def _find_max_gain(self, mailer: Mailer):
+        """
+        Method for iteration #4.
+
+        The agent does the following steps:
+
+            1. Check if the agent got the maximum gain.
+
+            2. Update according to step 1 the change_value attribute and send to the partner (if there
+                is one)
+
+        :param mailer: mailer for getting and sending messages
+        :return:
+        """
+
+        neighbors_gain: Dict[int, float] = {m.sender: m.content for m in mailer.get_messages(self.id)}
+
+        # Assert if length dont match what excepted
+        if self._partner is not None:
+            assert len(neighbors_gain) == len(self._neighbors) - 1
+        else:
+            assert len(neighbors_gain) == len(self._neighbors)
+
+        # If my gain is the maximum gain
+        if (self._gain > max(neighbors_gain.values())) & (self._gain > 0):
+
+            self._change_value = True
+
+        else:
+
+            self._change_value = False
+
+        # If I got a partner - update him
+        if self._partner is not None:
+
+            mailer.deliver_message(self.id, self._partner, self._change_value, 'Change Value')
+
+    def _update_new_value(self, mailer: Mailer):
+        """
+        iteration #5
+        todo: docstring
+        :param mailer:
+        :return:
+        """
+
+        # If the agent dont have value (lonely wolf according to Zohar)
+        if self._partner is None:
+
+            if self._change_value:
+
+                self.value = self._new_value
+
+        # The agent have a partner
+        else:
+
+            partner_change = mailer.get_messages(self.id)[0].content
+
+            if partner_change & self._change_value:
+
+                self.value = self._new_value
+
+        self.send_value_messages(mailer)
+
     def _find_best_offer(self, offers: Dict[int, Offer]) -> int:
         """
         The method get a dict of offers as { agent_id: Offer } and find the best offer.
@@ -307,6 +371,7 @@ class MGM2(Agent):
         self._partner = None
         self._committed = None
         self._new_value = None
+        self._change_value = None
 
         # Update gain and new value
         self._update_gain()
