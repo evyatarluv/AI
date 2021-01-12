@@ -86,10 +86,10 @@ class MGM2(Agent):
         self._neighbors_values: Dict[int, int] = {}
         self._committed: bool = False
         self._offer_prob: float = offer_prob
-        self._partner: int = None
-        self._new_value: int = None
-        self._gain: float = None
-        self._change_value: bool = None
+        self._partner = None
+        self._new_value = None
+        self._gain = None
+        self._change_value = None
         self._iteration_switcher: Dict[int, Callable] = {1: self._commit_offers,
                                                          2: self._response_offers,
                                                          3: self._send_gain,
@@ -113,7 +113,7 @@ class MGM2(Agent):
 
             1. Get his neighbors' values (using the messages from the last step)
 
-            2. Decide if to send an offer, if decide true - send an offer.
+            2. Decide if to send an offer.
 
         :param mailer: mailer for getting and sending messages
         :return:
@@ -122,20 +122,21 @@ class MGM2(Agent):
         # Get the current messages as neighbors' values
         self._neighbors_values = {m.sender: m.content for m in mailer.get_messages(self.id)}
 
-        # Reset attributes
-        self._reset_attributes()
+        # Override partner, gain and new_value from last cycle
+        self._partner = None
+        self._update_gain()
 
         # Decide to offer or not
         if np.random.random() < self._offer_prob:
 
             self._committed = True
 
-            # Choose neighbor
-            neighbor = np.random.choice(self._neighbors)
+            # Choose partner
+            partner = np.random.choice(self._neighbors)
 
             # Create & send the offer
             offer = Offer(self._neighbors_values, self._constraints, self.value, self._domain)
-            mailer.deliver_message(self.id, neighbor, offer, 'offer')
+            mailer.deliver_message(self.id, partner, offer, 'Offer')
 
         else:
 
@@ -154,6 +155,7 @@ class MGM2(Agent):
         :param mailer: mailer for getting and sending messages
         :return:
         """
+
         # Get all offers
         offers: Dict[int, Offer] = {m.sender: m.content for m in mailer.get_messages(self.id)}
 
@@ -170,8 +172,8 @@ class MGM2(Agent):
         # If the agent didn't committed an offer -
         # choose the best offer and response with `yes`
         else:
-
-            if len(offers) > 0:
+            # If the agent got offers choose the best one
+            if offers:
 
                 # Find the best value and update attributes
                 partner_value = self._find_best_offer(offers)
@@ -311,15 +313,16 @@ class MGM2(Agent):
         gains: Dict[int, Dict] = {}
 
         # For each offer find the best new values for both of us
-        # Then save these values and there new cost
+        # Then save these values and the new cost
         for sender, o in offers.items():
 
+            # Compute current cost
             current_cost = MGM2.compute_pair_cost(
                 agent_1=(self.id, self.value, self._neighbors_values, self._constraints),
-                agent_2=(sender, o.value, o.neighbors_values, o.constraints)
-            )
+                agent_2=(sender, o.value, o.neighbors_values, o.constraints))  # best cost as current cost
 
-            best_cost = current_cost  # pair cost
+            # Look for the best cost and values
+            best_cost = current_cost
             best_values = (self.value, o.value)  # tuple as (my_value, partner_value)
 
             # For each combination of assignments
@@ -359,23 +362,6 @@ class MGM2(Agent):
         # Return the partner new value
         return gains[best_partner]['partner_value']
 
-    def _reset_attributes(self):
-        """
-        Reset attributes at the start of a cycle.
-        These attributes relevant to each iteration separately.
-        :return:
-        """
-
-        # Attributes which back to default
-        self._gain = None
-        self._partner = None
-        self._committed = None
-        self._new_value = None
-        self._change_value = None
-
-        # Update gain and new value
-        self._update_gain()
-
     def _update_gain(self):
         """
         The method find the best new value and the corresponding gain.
@@ -413,8 +399,8 @@ class MGM2(Agent):
         partner_id, partner_value, partner_neighbors_values, partner_constraints = agent_2
 
         # Compute costs
-        partner_cost = Agent.agent_cost(partner_value, partner_neighbors_values, partner_constraints)
         self_cost = Agent.agent_cost(self_value, self_neighbors_values, self_constraints)
+        partner_cost = Agent.agent_cost(partner_value, partner_neighbors_values, partner_constraints)
         join_cost = self_constraints[partner_id][self_value][partner_value]
 
         return partner_cost + self_cost - join_cost

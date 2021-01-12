@@ -82,12 +82,12 @@ class Agent:
         :return: the current cost
         """
 
-        value_cost = 0
+        cost = 0
 
         # Find the cost for each neighbor
         for neighbor, neighbor_value in neighbors_values.items():
 
-            # Update the current cost
-            value_cost += constraints[neighbor][value][neighbor_value]
+            # Update the cost
+            cost += constraints[neighbor][value][neighbor_value]
 
-        return value_cost
+        return cost
