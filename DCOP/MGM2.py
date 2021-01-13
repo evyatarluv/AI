@@ -105,6 +105,7 @@ class MGM2(Agent):
         # Update iteration counter
         self._iteration_count = (self._iteration_count + 1) if self._iteration_count < 5 else 1
 
+    # Iteration 1
     def _commit_offers(self, mailer: Mailer):
         """
         Method for iteration #1.
@@ -142,6 +143,7 @@ class MGM2(Agent):
 
             self._committed = False
 
+    # Iteration 2
     def _response_offers(self, mailer: Mailer):
         """
         Method for iteration #2.
@@ -194,6 +196,7 @@ class MGM2(Agent):
                     # Send the message
                     mailer.deliver_message(self.id, sender, response, 'Response')
 
+    # Iteration 3
     def _send_gain(self, mailer: Mailer):
         """
         Method for iteration #3.
@@ -231,6 +234,7 @@ class MGM2(Agent):
 
                 mailer.deliver_message(self.id, neighbor, self._gain, 'Gain')
 
+    # Iteration 4
     def _find_max_gain(self, mailer: Mailer):
         """
         Method for iteration #4.
@@ -254,7 +258,6 @@ class MGM2(Agent):
         else:
             assert len(neighbors_gain) == len(self._neighbors)
 
-        # fixme: situation where I got a partner (and we have the same gain!!)
         # If my gain is the maximum gain
         if self._is_max_gain(neighbors_gain) & (self._gain > 0):
 
@@ -269,6 +272,7 @@ class MGM2(Agent):
 
             mailer.deliver_message(self.id, self._partner, self._change_value, 'Change Value')
 
+    # Iteration 5
     def _update_new_value(self, mailer: Mailer):
         """
         iteration #5
@@ -374,7 +378,7 @@ class MGM2(Agent):
         # For each value in the domain find current gain
         for value in self._domain:
 
-            gains[value] = self.compute_cost(value, self._neighbors_values) - current_cost
+            gains[value] = current_cost - self.compute_cost(value, self._neighbors_values)
 
         # Find the value with the max gain and update it
         self._new_value = max(gains, key=gains.get)
@@ -388,11 +392,6 @@ class MGM2(Agent):
         """
 
         for neighbor, gain in neighbors_gain.items():
-
-            # If this is my partner ignore him
-            if neighbor == self._partner:
-
-                continue
 
             if self._gain < gain:
 
