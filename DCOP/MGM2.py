@@ -254,6 +254,7 @@ class MGM2(Agent):
         else:
             assert len(neighbors_gain) == len(self._neighbors)
 
+        # fixme: situation where I got a partner (and we have the same gain!!)
         # If my gain is the maximum gain
         if self._is_max_gain(neighbors_gain) & (self._gain > 0):
 
@@ -387,6 +388,11 @@ class MGM2(Agent):
         """
 
         for neighbor, gain in neighbors_gain.items():
+
+            # If this is my partner ignore him
+            if neighbor == self._partner:
+
+                continue
 
             if self._gain < gain:
 
