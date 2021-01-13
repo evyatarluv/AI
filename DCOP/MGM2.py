@@ -1,7 +1,8 @@
 from .Agent import Agent
 from .Mailer import Mailer
+from .Message import Message
 import numpy as np
-from typing import List, Dict, Callable, Any, Tuple
+from typing import List, Dict, Callable, Tuple
 from itertools import product
 from copy import deepcopy
 
@@ -94,8 +95,7 @@ class MGM2(Agent):
                                                          2: self._response_offers,
                                                          3: self._send_gain,
                                                          4: self._find_max_gain,
-                                                         5: self._update_new_value,
-                                                         }
+                                                         5: self._update_new_value}
 
     def iteration(self, mailer: Mailer):
 
@@ -170,13 +170,13 @@ class MGM2(Agent):
 
                 mailer.deliver_message(self.id, sender, response, 'Response')
 
-        # If the agent didn't committed an offer -
-        # choose the best offer and response with `yes`
+        # If the agent didn't committed an offer
         else:
-            # If the agent got offers choose the best one
+            # If the agent got offers -
+            # choose the best offer and response with `yes`
             if offers:
 
-                # Find the best value and update attributes
+                # Find the best offer and update attributes
                 partner_value = self._find_best_offer(offers)
 
                 # Accept the best offer reject all others
@@ -320,7 +320,7 @@ class MGM2(Agent):
             # Compute current cost
             current_cost = MGM2.compute_pair_cost(
                 agent_1=(self.id, self.value, self._neighbors_values, self._constraints),
-                agent_2=(sender, o.value, o.neighbors_values, o.constraints))  # best cost as current cost
+                agent_2=(sender, o.value, o.neighbors_values, o.constraints))
 
             # Look for the best cost and values
             best_cost = current_cost
@@ -340,8 +340,7 @@ class MGM2(Agent):
                 # Compute new cost
                 new_cost = MGM2.compute_pair_cost(
                     agent_1=(self.id, self_value, self_neighbors_values, self._constraints),
-                    agent_2=(sender, partner_value, partner_neighbors_values, o.constraints)
-                )
+                    agent_2=(sender, partner_value, partner_neighbors_values, o.constraints))
 
                 # Update best cost and values
                 if new_cost < best_cost:
@@ -353,15 +352,13 @@ class MGM2(Agent):
                              'gain': current_cost - best_cost}
 
         # Get the best partner corresponding to the max gain
-        best_partner = max(gains, key=lambda x: gains.get(x)['gain'])
+        self._partner = max(gains, key=lambda x: gains.get(x)['gain'])
 
         # Update partner, gain and new value
-        self._partner = best_partner
-        self._gain = gains[best_partner]['gain']
-        self._new_value = gains[best_partner]['self_value']
+        self._new_value, partner_value, self._gain = gains[self._partner].values()
 
         # Return the partner new value
-        return gains[best_partner]['partner_value']
+        return partner_value
 
     def _update_gain(self):
         """
