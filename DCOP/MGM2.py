@@ -167,6 +167,7 @@ class MGM2(Agent):
             response = Response(accept=False)
 
             for sender in offers.keys():
+
                 mailer.deliver_message(self.id, sender, response, 'Response')
 
         # If the agent didn't committed an offer -
@@ -254,7 +255,7 @@ class MGM2(Agent):
             assert len(neighbors_gain) == len(self._neighbors)
 
         # If my gain is the maximum gain
-        if (self._gain > max(neighbors_gain.values())) & (self._gain > 0):
+        if self._is_max_gain(neighbors_gain) & (self._gain > 0):
 
             self._change_value = True
 
@@ -381,6 +382,25 @@ class MGM2(Agent):
         self._new_value = max(gains, key=gains.get)
         self._gain = gains[self._new_value]
 
+    def _is_max_gain(self, neighbors_gain):
+        """
+        todo: add docstring
+        :param neighbors_gain:
+        :return:
+        """
+
+        for neighbor, gain in neighbors_gain.items():
+
+            if self._gain < gain:
+
+                return False
+
+            elif (self._gain == gain) & (self.id < neighbor):
+
+                return False
+
+        return True
+
     @staticmethod
     def compute_pair_cost(agent_1: Tuple, agent_2: Tuple):
         """
@@ -404,6 +424,7 @@ class MGM2(Agent):
         join_cost = self_constraints[partner_id][self_value][partner_value]
 
         return partner_cost + self_cost - join_cost
+
 
 
 

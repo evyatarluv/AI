@@ -105,7 +105,7 @@ def main():
     # Init params
     mailer = Mailer()
     agents, n_iterations = init_agents(mailer, config)
-    total_cost = []
+    total_cost = [compute_total_cost(agents)]
 
     # Solve
     for _ in tqdm(range(n_iterations)):
