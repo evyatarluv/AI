@@ -275,13 +275,21 @@ class MGM2(Agent):
     # Iteration 5
     def _update_new_value(self, mailer: Mailer):
         """
-        iteration #5
-        todo: docstring
-        :param mailer:
+        Method for iteration #5.
+
+        The agent does the following steps:
+
+            1. If the agent have no partner and have max gain - change value
+
+            2. If the agent have partner and both of them got max gain - change value
+
+            3. For any other option the agent stay with his old value
+
+        :param mailer: mailer for getting and sending messages
         :return:
         """
 
-        # If the agent dont have value (lonely wolf according to Zohar)
+        # If the agent dont have partner (lonely wolf according to Zohar)
         if self._partner is None:
 
             if self._change_value:
@@ -384,11 +392,21 @@ class MGM2(Agent):
         self._new_value = max(gains, key=gains.get)
         self._gain = gains[self._new_value]
 
-    def _is_max_gain(self, neighbors_gain):
+    def _is_max_gain(self, neighbors_gain: Dict[int, float]) -> bool:
         """
-        todo: add docstring
-        :param neighbors_gain:
-        :return:
+        The method check if the agent have max gain relative to his neighbors.
+
+        The method uses the neighbors_gain dict to compare the gains. The gain of the agent's
+        partner (if so) was already removed from the dict.
+
+        Note:
+        ----
+        In case of equality between gain - tiebreaker with index (the agent with the bigger
+        index win)
+
+        :param neighbors_gain: dict with the neighbors' gain while each key is the neighbor id
+                                and the value is the neighbor's gain.
+        :return: bool answer, True for max and False otherwise.
         """
 
         for neighbor, gain in neighbors_gain.items():
