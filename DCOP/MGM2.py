@@ -131,20 +131,27 @@ class MGM2(Agent):
         self._update_gain()
 
         # Decide to offer or not
+        partner = None
         if np.random.random() < self._offer_prob:
 
             self._committed = True
-
-            # Choose partner
             partner = np.random.choice(self._neighbors)
-
-            # Create & send the offer
-            offer = Offer(self._neighbors_values, self._constraints, self.value, self._domain)
-            mailer.deliver_message(self.id, partner, offer, 'Offer')
 
         else:
 
             self._committed = False
+
+        # Send messages to neighbors
+        for neighbor in self._neighbors:
+
+            if neighbor == partner:
+                msg = Offer(self._neighbors_values, self._constraints, self.value, self._domain)
+
+            else:
+                msg = None
+
+            # Send the message
+            mailer.deliver_message(self.id, neighbor, msg, 'Offer')
 
     # Iteration 2
     def _response_offers(self, mailer: Mailer):
@@ -162,42 +169,61 @@ class MGM2(Agent):
         """
 
         # Get all offers
-        offers: Dict[int, Offer] = {m.sender: m.content for m in mailer.get_messages(self.id)}
+        offers: Dict[int, Offer] = {m.sender: m.content
+                                    for m in mailer.get_messages(self.id) if m.content is not None}
 
-        # If the agent committed an offer -
-        # answer `no` to all offers
-        if self._committed:
+        ## --------------------------
+        partner_value = self._find_best_offer(offers)
 
-            # Create the response message
-            response = Response(accept=False)
+        for neighbor in self._neighbors:
 
-            for sender in offers.keys():
+            if neighbor == self._partner:
+                msg = Response(accept=True, gain=self._gain, value=partner_value)
 
-                mailer.deliver_message(self.id, sender, response, 'Response')
+            elif neighbor in offers.keys():
+                msg = Response(accept=False)
 
-        # If the agent didn't committed an offer
-        else:
-            # If the agent got offers -
-            # choose the best offer and response with `yes`
-            if offers:
+            else:
+                msg = None
 
-                # Find the best offer and update attributes
-                partner_value = self._find_best_offer(offers)
+            mailer.deliver_message(self.id, neighbor, msg, 'Response')
 
-                # Accept the best offer reject all others
-                for sender in offers.keys():
+        ## --------------------------
 
-                    # Create the response message according the sender
-                    if sender == self._partner:
-
-                        response = Response(accept=True, gain=self._gain, value=partner_value)
-
-                    else:
-
-                        response = Response(accept=False)
-
-                    # Send the message
-                    mailer.deliver_message(self.id, sender, response, 'Response')
+        # # If the agent committed an offer -
+        # # answer `no` to all offers
+        # if self._committed:
+        #
+        #     # Create the response message
+        #     response = Response(accept=False)
+        #
+        #     for sender in offers.keys():
+        #
+        #         mailer.deliver_message(self.id, sender, response, 'Response')
+        #
+        # # If the agent didn't committed an offer
+        # else:
+        #     # If the agent got offers -
+        #     # choose the best offer and response with `yes`
+        #     if offers:
+        #
+        #         # Find the best offer and update attributes
+        #         partner_value = self._find_best_offer(offers)
+        #
+        #         # Accept the best offer reject all others
+        #         for sender in offers.keys():
+        #
+        #             # Create the response message according the sender
+        #             if sender == self._partner:
+        #
+        #                 response = Response(accept=True, gain=self._gain, value=partner_value)
+        #
+        #             else:
+        #
+        #                 response = Response(accept=False)
+        #
+        #             # Send the message
+        #             mailer.deliver_message(self.id, sender, response, 'Response')
 
     # Iteration 3
     def _send_gain(self, mailer: Mailer):
@@ -215,12 +241,15 @@ class MGM2(Agent):
         :return:
         """
 
+        # Get response
+        msg: List[Message] = [m for m in mailer.get_messages(self.id) if m.content is not None]
+
         # If an offer was committed - look for your response
         if self._committed:
 
             # Unpack the response from the message
-            sender: int = mailer.get_messages(self.id)[0].sender
-            response: Response = mailer.get_messages(self.id)[0].content
+            sender: int = msg[0].sender
+            response: Response = msg[0].content
 
             # If the partner accept my offer
             if response.accept:
@@ -270,10 +299,17 @@ class MGM2(Agent):
 
             self._change_value = False
 
-        # If I got a partner - update him
-        if self._partner is not None:
+        # Send messages to neighbors
+        # To the partner send the `change_value` attribute
+        for neighbor in self._neighbors:
 
-            mailer.deliver_message(self.id, self._partner, self._change_value, 'Change Value')
+            if neighbor == self._partner:
+                msg = self._change_value
+
+            else:
+                msg = None
+
+            mailer.deliver_message(self.id, self._partner, msg, 'Change Value')
 
     # Iteration 5
     def _update_new_value(self, mailer: Mailer):
@@ -291,6 +327,8 @@ class MGM2(Agent):
         :param mailer: mailer for getting and sending messages
         :return:
         """
+        # Get messages
+        msg: List[Message] = [m for m in mailer.get_messages(self.id) if m.content is not None]
 
         # If the agent dont have partner (lonely wolf according to Zohar)
         if self._partner is None:
@@ -302,7 +340,7 @@ class MGM2(Agent):
         # The agent have a partner
         else:
 
-            partner_change = mailer.get_messages(self.id)[0].content
+            partner_change = msg[0].content
 
             if partner_change & self._change_value:
 
@@ -324,6 +362,10 @@ class MGM2(Agent):
         :param offers: dict with all the offers as value and bidder as key.
         :return: partner's values, int
         """
+
+        # todo
+        if (len(offers) == 0) | self._committed:
+            return -1
 
         # Init gains dict with the form of:
         # { bidder_id: {self_value: int, partner_value: int, gain: float} }
