@@ -3,6 +3,8 @@ import numpy as np
 
 def generate_constraints(n_variables: int, n_domain: int, n_constraints: int) -> set:
 
+    print('Generating constraints...\n')
+
     constraints = set()
 
     while len(constraints) < n_constraints:

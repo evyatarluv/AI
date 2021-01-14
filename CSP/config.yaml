@@ -1,5 +1,6 @@
-enviroment:
-  n_variables: 30
+environment:
+  n_variables: 20
   n_domain: 10
-  n_constraints: 50
+  n_constraints: 5000
   algorithm: BT
+  seed: 42
