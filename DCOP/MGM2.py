@@ -75,10 +75,10 @@ class MGM2(Agent):
     Attributes:
     ----------
 
-    todo: add attributes explanation
+    todo: add attributes' explanation
 
     """
-
+    # todo: Roie told in the lecture that in MGM2 in every iteration all agents must send messages
     def __init__(self, agent_id, constraints, domain, offer_prob):
 
         super(MGM2, self).__init__(agent_id, constraints, domain)
