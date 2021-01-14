@@ -32,6 +32,7 @@ class Agent:
         self._domain: List[int] = domain
         self.value: int = np.random.choice(domain)
         self._neighbors: List[int] = list(self._constraints.keys())
+        self._cost: int = np.inf
 
     def compute_cost(self, value: int, agents_values: Dict[int, int]) -> float:
         """
@@ -91,3 +92,8 @@ class Agent:
             cost += constraints[neighbor][value][neighbor_value]
 
         return cost
+
+    @property
+    def cost(self):
+        # return 'Dont touch my cost'
+        return self._cost

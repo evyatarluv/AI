@@ -118,9 +118,7 @@ def main():
             a.iteration(mailer)
 
         # Update total cost
-        # fixme: each agent compute his own cost (?)
-        # total_cost.append(sum([a.cost for a in agents]))
-        total_cost.append(compute_total_cost(agents))
+        total_cost.append(sum([a.cost for a in agents]))
 
     # Plot cost
     plot_cost(total_cost, config)

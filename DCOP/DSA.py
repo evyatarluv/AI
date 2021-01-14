@@ -45,6 +45,9 @@ class DSA(Agent):
         # Get the current messages as neighbors' values
         neighbors_values = {m.sender: m.content for m in mailer.get_messages(self.id)}
 
+        # Update cost
+        self._cost = self.compute_cost(self.value, neighbors_values)
+
         # Find the current best value
         new_value = self._find_best_value(neighbors_values)
 

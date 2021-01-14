@@ -1,7 +1,5 @@
 enviroment:
   n_variables: 30
   n_domain: 10
-
-constraints:
-  density: 0.5
-  toughness: 0.5
+  n_constraints: 50
+  algorithm: BT

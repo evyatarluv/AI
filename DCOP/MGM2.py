@@ -123,6 +123,9 @@ class MGM2(Agent):
         # Get the current messages as neighbors' values
         self._neighbors_values = {m.sender: m.content for m in mailer.get_messages(self.id)}
 
+        # Update cost
+        self._cost = self.compute_cost(self.value, self._neighbors_values)
+
         # Override partner, gain and new_value from last cycle
         self._partner = None
         self._update_gain()

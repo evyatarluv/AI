@@ -1,33 +1,49 @@
+from typing import List, Dict, Tuple
+
 import numpy as np
 from copy import deepcopy
+
+
+class Variable:
+
+    def __init__(self, variable_id, domain, value):
+
+        self.id: int = variable_id
+        self.domain: List[int] = deepcopy(domain)
+        self.current_domain: List[int] = deepcopy(domain)
+        self.value = value
+
+    def reset_domain(self):
+
+        self.current_domain = deepcopy(self.domain)
+
+    # todo: use property for current domain
 
 
 class Backtracking:
 
     def __init__(self, n_variables, n_domain, constraints):
 
-        self.n_variables = n_variables
-        self.n_domain = n_domain
-        self.constraints = constraints
+        self.n_variables: int = n_variables
+        self.n_domain: int = n_domain
+        self.constraints: set = constraints
 
     def solve(self):
 
-        # Init variables' values as `None`
-        solution = {i: None for i in range(self.n_variables)}
-
-        # Init variables' domain as full
-        domains = {i: range(self.n_domain) for i in self.n_variables}
+        # Init solution as variables with `None`
+        domain = range(self.n_domain)
+        solution = {i: Variable(i, domain, None) for i in range(self.n_variables)}
 
         # Make assignment for all variables recursively
-        solution = self.assign_variable(1, domains, solution)
+        solution = self.assign_variable(1, solution)
 
         return solution
 
-    def assign_variable(self, variable, domains, solution):
+    def assign_variable(self, variable, solution: Dict[int, Variable]):
 
         # If we need to assign value for variable 1 and his domain his empty -
         # there is no solution so return `None`
-        if (variable == 1) & (len(domains[variable]) == 0):
+        if (variable == 1) & (len(solution[variable].current_domain) == 0):
 
             return None
 
@@ -38,34 +54,48 @@ class Backtracking:
             return solution
 
         # Else - look for legal value for the current variable
-        value, domains = self.find_legal_value(variable, domains, deepcopy(solution))
+        value = self.find_legal_value(variable, solution)
 
         if value is None:
 
-            domains[variable] = range(self.n_domain)
+            solution[variable].reset_domain()
 
-            return self.assign_variable(variable - 1, domains, solution)
+            return self.assign_variable(variable - 1, solution)
 
         else:
-            solution[variable] = value
-            return self.assign_variable(variable + 1, domains, solution)
 
-    def find_legal_value(self, variable, domains, solution):
+            solution[variable].value = value
+            return self.assign_variable(variable + 1, solution)
 
-        for value in domains[variable]:
+    def find_legal_value(self, variable: int, solution: Dict[int, Variable]):
 
-            domains[variable].remove(value)  # remove the value from the domain
-            solution[variable] = value  # update solution
+        variable_domain = deepcopy(solution[variable].current_domain)
 
-            if self.is_legal_solution(solution):
+        for value in solution[variable].current_domain:
 
-                return value, domains
+            legal = True
 
-        return None, domains
+            for other_variable in range(1, variable):
 
-    def is_legal_solution(self, solution):
+                # Check if constraint like this exist
+                constraint = (variable, value, other_variable, solution[other_variable].value)
 
-        pass
+                if constraint in self.constraints:
+
+                    legal = False
+                    variable_domain.remove(value)
+                    break
+
+            if legal:
+
+                solution[variable].current_domain = deepcopy(variable_domain)
+                return value
+
+        return None
+
+
+
+
 
 
 
