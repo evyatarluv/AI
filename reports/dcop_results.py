@@ -72,7 +72,7 @@ def init_agents(mailer: Mailer, config):
     return agents, n_iteration
 
 
-def main():
+def compare_p2():
 
     results = {}  # in the form of { val_1: [run_1, run_2, ...., ], ... }
 
@@ -123,5 +123,11 @@ def main():
     pickle.dump(results, open(filename, 'wb'))
 
 
+def compare_iterations():
+    pass
+
+
 if __name__ == '__main__':
-    main()
+    compare_p2()
+    
+    compare_iterations()
