@@ -132,7 +132,7 @@ class MGM2(Agent):
 
         # Decide to offer or not
         partner = None
-        if np.random.random() < self._offer_prob:
+        if (np.random.random() < self._offer_prob) and self._neighbors:
 
             self._committed = True
             partner = np.random.choice(self._neighbors)
@@ -172,7 +172,7 @@ class MGM2(Agent):
         offers: Dict[int, Offer] = {m.sender: m.content
                                     for m in mailer.get_messages(self.id) if m.content is not None}
 
-        ## --------------------------
+        # Get best offer (if so)
         partner_value = self._find_best_offer(offers)
 
         for neighbor in self._neighbors:
@@ -187,43 +187,6 @@ class MGM2(Agent):
                 msg = None
 
             mailer.deliver_message(self.id, neighbor, msg, 'Response')
-
-        ## --------------------------
-
-        # # If the agent committed an offer -
-        # # answer `no` to all offers
-        # if self._committed:
-        #
-        #     # Create the response message
-        #     response = Response(accept=False)
-        #
-        #     for sender in offers.keys():
-        #
-        #         mailer.deliver_message(self.id, sender, response, 'Response')
-        #
-        # # If the agent didn't committed an offer
-        # else:
-        #     # If the agent got offers -
-        #     # choose the best offer and response with `yes`
-        #     if offers:
-        #
-        #         # Find the best offer and update attributes
-        #         partner_value = self._find_best_offer(offers)
-        #
-        #         # Accept the best offer reject all others
-        #         for sender in offers.keys():
-        #
-        #             # Create the response message according the sender
-        #             if sender == self._partner:
-        #
-        #                 response = Response(accept=True, gain=self._gain, value=partner_value)
-        #
-        #             else:
-        #
-        #                 response = Response(accept=False)
-        #
-        #             # Send the message
-        #             mailer.deliver_message(self.id, sender, response, 'Response')
 
     # Iteration 3
     def _send_gain(self, mailer: Mailer):
