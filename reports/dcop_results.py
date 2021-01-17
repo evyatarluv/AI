@@ -55,7 +55,6 @@ def init_agents(mailer: Mailer, config):
         elif agents_type.lower() == 'mgm2':
 
             # Init MGM2 params
-            # todo: think of something wiser
             n_iteration = config['MGM2']['iterations_in_cycle'] * config['environment']['n_iteration']
             offer_prob = config['MGM2']['offer_probability']
 
@@ -124,10 +123,49 @@ def compare_p2():
 
 
 def compare_iterations():
-    pass
+
+    results = {}  # in the form of { run_1: [iter_1, iter_2, .... ] }
+
+    # Load configuration file
+    config_path = os.path.join(root_directory, 'DCOP/config.yaml')
+    config = yaml.full_load(open(config_path))
+
+    # Run it n_runs times
+    for i in range(n_runs):
+
+        # Update seed
+        config['constraints']['seed'] += i
+
+        # Generate constraints
+        generate_constraints(config)
+
+        # Init params
+        mailer = Mailer()
+        agents, n_iterations = init_agents(mailer, config)
+        total_cost = []
+
+        # Solve
+        for _ in tqdm(range(n_iterations)):
+
+            # Move messages to inbox
+            mailer.assign_messages()
+
+            # Run each agent iteration
+            for a in agents:
+                a.iteration(mailer)
+
+            # Update total cost
+            total_cost.append(sum([a.cost for a in agents]))
+
+        # Update the results
+        results[i] = total_cost
+
+    filename = 'results/compare_iterations/{}.pickle'.format(config['environment']['agents_type'])
+    pickle.dump(results, open(filename, 'wb'))
 
 
 if __name__ == '__main__':
-    compare_p2()
+
+    # compare_p2()
     
     compare_iterations()
