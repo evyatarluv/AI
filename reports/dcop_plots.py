@@ -13,8 +13,6 @@ def compare_p2():
     p2 = [round(v, 2) for v in dsa.keys()]
 
     # Plot
-    # fig, (dsa_ax, mgm2_ax) = plt.subplots(1, 2)
-
     # DSA
     dsa_means = [np.mean(lst) for lst in dsa.values()]
     dsa_stds = [np.std(lst) for lst in dsa.values()]
@@ -30,7 +28,7 @@ def compare_p2():
     plt.legend()
     plt.ylabel('Sum of Costs')
     plt.xlabel(r'$p_2$')
-    plt.title(r'Compare $p_2$ Influence')
+    plt.title(r'Compare $p_2$ Influence ($p_1$ = 0.2)')
     plt.show()
 
 

@@ -17,6 +17,7 @@ root_directory = Path(__file__).parent.parent
 
 # Results params
 n_runs = 10
+p1 = 0.5
 p2_values = np.arange(0.1, 1, 0.1)
 
 
@@ -84,6 +85,7 @@ def compare_p2():
         config_path = os.path.join(root_directory, 'DCOP/config.yaml')
         config = yaml.full_load(open(config_path))
         config['constraints']['problem_toughness'] = p2  # update p2
+        config['constraints']['problem_density'] = p1  # update p1
 
         # Init results list for the current p2 value
         results[p2] = []
@@ -118,7 +120,8 @@ def compare_p2():
             # Update the results
             results[p2].append(total_cost[-1])
 
-    filename = 'results/compare_p2/{}.pickle'.format(config['environment']['agents_type'])
+    filename = 'results/compare_p2/p1_{}/{}.pickle'.format(str(p1).replace('.', ''),
+                                                           config['environment']['agents_type'])
     pickle.dump(results, open(filename, 'wb'))
 
 
@@ -129,6 +132,7 @@ def compare_iterations():
     # Load configuration file
     config_path = os.path.join(root_directory, 'DCOP/config.yaml')
     config = yaml.full_load(open(config_path))
+    config['constraints']['problem_density'] = p1  # update p1
 
     # Run it n_runs times
     for i in range(n_runs):
@@ -160,7 +164,8 @@ def compare_iterations():
         # Update the results
         results[i] = total_cost
 
-    filename = 'results/compare_iterations/{}.pickle'.format(config['environment']['agents_type'])
+    filename = 'results/compare_iterations/p1_{}/{}.pickle'.format(str(p1).replace('.', ''),
+                                                             config['environment']['agents_type'])
     pickle.dump(results, open(filename, 'wb'))
 
 
