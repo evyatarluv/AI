@@ -85,6 +85,6 @@ def compare_iterations():
 
 if __name__ == '__main__':
 
-    compare_p2()
+    # compare_p2()
     
-    # compare_iterations()
+    compare_iterations()
