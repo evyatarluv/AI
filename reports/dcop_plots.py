@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def compare_p2():
 
-    fig, (p1_02, p1_05) = plt.subplots(1, 2)
+    fig, (p1_02, p1_05) = plt.subplots(1, 2, sharey=True)
 
     for p1_value, ax in [(0.2, p1_02), (0.5, p1_05)]:
 
@@ -70,8 +70,8 @@ def compare_iterations():
 
         # Plot
         # fig, (dsa_ax, mgm2_ax) = plt.subplots(1, 2, sharey=True)
-        # plt.errorbar(iterations, dsa_mean, yerr=dsa_std, capsize=2.5, fmt='-o', label='DSA-C')
-        # plt.errorbar(iterations, mgm2_mean, yerr=mgm2_std, capsize=2.5, fmt='-o', label='MGM2')
+        # ax.errorbar(iterations, dsa_mean, yerr=dsa_std, capsize=2.5, fmt='-o', label='DSA-C')
+        # ax.errorbar(iterations, mgm2_mean, yerr=mgm2_std, capsize=2.5, fmt='-o', label='MGM2')
         ax.plot(iterations, dsa_mean, label='DSA-C')
         ax.plot(iterations, mgm2_mean, label='MGM2')
         ax.grid(axis='y')
